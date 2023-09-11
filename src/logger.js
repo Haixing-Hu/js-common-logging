@@ -223,6 +223,7 @@ class Logger {
         } else {
           // binds the private logging method of this object to the
           // corresponding logging method of this.appender.
+          // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
           this[m] = Function.prototype.bind.call(appender[m], appender, `[${l}]`);
         }
       }
