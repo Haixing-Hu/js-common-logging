@@ -8,10 +8,17 @@
  ******************************************************************************/
 
 /**
- * Predefined logging levels.
+ * A no-operation function.
  *
  * @author Haixing Hu
  * @private
+ */
+const NOOP = () => {};
+
+/**
+ * Predefined logging levels.
+ *
+ * @author Haixing Hu
  */
 const LOGGING_LEVELS = {
   TRACE: 0,
@@ -33,9 +40,16 @@ const DEFAULT_LOGGING_LEVEL = 'DEBUG';
 /**
  * A simple logging class.
  *
- * When passing a string to one of the `Logger` object's logging methods that
- * accepts a string (such as `info()`, `debug()`), you may use these
- * substitution strings:
+ * A `Logger` object provides the following logging methods:
+ *
+ * - `Logger.trace(message, arg1, arg2, ...)`: Outputs a log message with the `TRACE` level.
+ * - `Logger.debug(message, arg1, arg2, ...)`: Outputs a log message with the `DEBUG` level.
+ * - `Logger.info(message, arg1, arg2, ...)`: Outputs a log message with the `INFO` level.
+ * - `Logger.warn(message, arg1, arg2, ...)`: Outputs a log message with the `WARN` level.
+ * - `Logger.error(message, arg1, arg2, ...)`: Outputs a log message with the `ERROR` level.
+ *
+ * The message argument of those logging methods supports the following
+ * substitution patterns:
  *
  * - `%o` or `%O`: Outputs a JavaScript object. Clicking the object name opens
  *    more information about it in the inspector.
@@ -62,37 +76,25 @@ class Logger {
    *     The default value of this argument is `console`.
    */
   constructor(level = DEFAULT_LOGGING_LEVEL, appender = console) {
-    this.setLevel(level);
-    this.setAppender(appender);
-    this.log = this._log;
-    this.trace = this._trace;
-    this.debug = this._debug;
-    this.info = this._info;
-    this.warn = this._warn;
-    this.error = this._error;
-    this.lastTimestamp = '';    // remember the timestamp of the last log output
+    this._checkLoggingLevel(level);
+    this._checkAppend(appender);
+    this.appender = appender;
+    this.level = level;
+    this._bindLoggingMethods(level, appender);
   }
 
   /**
    * Disable this logging object.
    */
   disable() {
-    this.log = () => {};
-    this.debug = () => {};
-    this.info = () => {};
-    this.warn = () => {};
-    this.error = () => {};
+    this._bindLoggingMethods('NONE', this.appender);
   }
 
   /**
    * Enable this logging object.
    */
   enable() {
-    this.log = this._log;
-    this.debug = this._debug;
-    this.info = this._info;
-    this.warn = this._warn;
-    this.error = this._error;
+    this._bindLoggingMethods(this.level, this.appender);
   }
 
   /**
@@ -110,6 +112,16 @@ class Logger {
   }
 
   /**
+   * Get the appender of this logger.
+   *
+   * @return {Object}
+   *     The appender of this logger.
+   */
+  getAppender() {
+    return this.appender;
+  }
+
+  /**
    * Set up a new Appender.
    *
    * @param {Object} appender
@@ -118,6 +130,8 @@ class Logger {
    *     methods.
    */
   setAppender(appender) {
+    this._checkAppend(appender);
+    this._bindLoggingMethods(this.level, appender);
     this.appender = appender;
   }
 
@@ -140,139 +154,79 @@ class Logger {
    *     `WARN`, `ERROR`, and `NONE`.
    */
   setLevel(level) {
-    if (LOGGING_LEVELS[level] === undefined) {
-      throw new RangeError(
-          `Unknown logging level "${level}". `
-        + 'Possible values are："TRACE", "DEBUG", "INFO", "WARN", "ERROR", "NONE"。'
-      );
-    }
+    level = level.toUpperCase();
+    this._checkLoggingLevel(level);
+    this._bindLoggingMethods(level, this.appender);
     this.level = level;
   }
 
   /**
-   * Log a message.
+   * Checks the validity of an appender.
    *
-   * @param {String} level
-   *     The log level for this message.
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     Parameters used to format the message string.
+   * @param {Object} appender
+   *     The appender to be checked. If it is invalid, an `Error` will be thrown.
    * @private
    */
-  _log(level, message, args) {
-    if (LOGGING_LEVELS[level] < LOGGING_LEVELS[this.level]) {
-      return;
+  _checkAppend(appender) {
+    if (!appender) {
+      throw new Error('The appender for a logger cannot be `null` nor `undefined`.');
     }
-    const timestamp = new Date().toISOString();
-    const output = this._getOutput(level);
-    output(`[${level}]`, timestamp, message, ...args);
-    this.lastTimestamp = timestamp;   // 记录日志输出时的时间戳
-  }
-
-  /**
-   * Get the output function of the appender corresponding to the specified
-   * logging level.
-   *
-   * Note that in order to allow some virtual consoles (such as VConsole, Eruda,
-   * etc.) to correctly inject the console, you cannot use map to pre-define
-   * the console output functions corresponding to each level, but must obtain
-   * the console output functions corresponding to each level in real time
-   * during output.
-   *
-   * @param {String} level
-   *     Specified logging level.
-   * @return {Function}
-   *     According to the specified logging level, return the corresponding
-   *     appender object method.
-   * @private
-   */
-  _getOutput(level) {
-    switch (level) {
-      case 'TRACE':
-        return this.appender.trace;
-      case 'DEBUG':
-        return this.appender.debug;
-      case 'INFO':
-        return this.appender.info;
-      case 'WARN':
-        return this.appender.warn;
-      case 'ERROR':
-        return this.appender.error;
-      default:
-        return () => {};
+    for (const level in LOGGING_LEVELS) {
+      if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
+        const methodName = level.toLowerCase();
+        if (!appender[methodName]) {
+          throw new Error(`The appender of this logger has no ${methodName}() method.`);
+        }
+      }
     }
   }
 
   /**
-   * Logs a message in the TRACE level.
+   * Checks the validity of a logging level.
    *
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     the array of arguments used to format the message.
+   * @param {String} level
+   *     The logging level to be checked. If it is invalid, an `Error` will be
+   *     thrown.
    * @private
    */
-  _trace(message, ...args) {
-    this._log('TRACE', message, args);
+  _checkLoggingLevel(level) {
+    if (LOGGING_LEVELS[level] === undefined) {
+      throw new RangeError(`Unknown logging level "${level}". `
+          + 'Possible values are："TRACE", "DEBUG", "INFO", "WARN", "ERROR", "NONE"。');
+    }
   }
 
   /**
-   * Logs a message in the DEBUG level.
+   * Rebinds all logging implementation methods to the corresponding logging
+   * methods of the appender.
    *
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     the array of arguments used to format the message.
+   * @param {String} level
+   *     The target logging level. All logging methods belows this target logging
+   *     level will be bind to a no-op function, while all logging methods above
+   *     or equal to this target logging level will be bind to the corresponding
+   *     logging methods of the appender. This argument should be a valid
+   *     logging level. The function do not check the validity of this argument.
+   * @param {Object} appender
+   *     The appender whose logging methods will be bound to the corresponding
+   *     logging methods of this logger. This argument should be a valid appender.
+   *     The function do not check the validity of this argument.
    * @private
    */
-  _debug(message, ...args) {
-    this._log('DEBUG', message, args);
-  }
-
-  /**
-   * Logs a message in the INFO level.
-   *
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     the array of arguments used to format the message.
-   * @private
-   */
-  _info(message, ...args) {
-    this._log('INFO', message, args);
-  }
-
-  /**
-   * Logs a message in the WARN level.
-   *
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     the array of arguments used to format the message.
-   * @private
-   */
-  _warn(message, ...args) {
-    this._log('WARN', message, args);
-  }
-
-  /**
-   * Logs a message in the ERROR level.
-   *
-   * @param {String} message
-   *     Template for the specified message. The message can contain substitution
-   *     strings in the form of `%s`, `%o`, `%d`, `%f`, etc.
-   * @param {Array} args
-   *     the array of arguments used to format the message.
-   * @private
-   */
-  _error(message, ...args) {
-    this._log('ERROR', message, args);
+  _bindLoggingMethods(level, appender) {
+    const target = LOGGING_LEVELS[level];
+    for (const l in LOGGING_LEVELS) {
+      if (Object.hasOwn(LOGGING_LEVELS, l) && (l !== 'NONE')) {
+        const m = l.toLowerCase();
+        if (LOGGING_LEVELS[l] < target) {
+          // binds the private logging method of this object to no-op
+          this[m] = NOOP;
+        } else {
+          // binds the private logging method of this object to the
+          // corresponding logging method of this.appender.
+          this[m] = Function.prototype.bind.call(appender[m], appender, `[${l}]`);
+        }
+      }
+    }
   }
 }
 
@@ -284,6 +238,8 @@ class Logger {
 const logger = new Logger();
 
 export {
+  LOGGING_LEVELS,
+  DEFAULT_LOGGING_LEVEL,
   Logger,
   logger,
 };

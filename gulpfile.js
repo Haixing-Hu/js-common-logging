@@ -15,8 +15,8 @@ const jsdoc = require('gulp-jsdoc3');
 const webpack = require('webpack-stream');
 
 const PATH = {
-  sources: [`./src/**/*.js`],
-  tests: [`./test/**/*.test.js`],
+  sources: ['./src/**/*.js'],
+  tests: ['./test/**/*.test.js'],
 };
 PATH.all = PATH.sources.concat(PATH.tests);
 
@@ -46,7 +46,7 @@ function test() {
       '\\.js$': 'babel-jest',
       '\\.vue$': 'vue-jest',
     },
-    transformIgnorePatterns: ["/node_modules/"],
+    transformIgnorePatterns: ['/node_modules/'],
     testEnvironment: 'jest-environment-jsdom-global',
     setupFilesAfterEnv: ['jest-extended/all'],
     collectCoverage: true,
@@ -54,7 +54,7 @@ function test() {
   };
   if (hasTarget) {
     const target = testTarget.substring('--target='.length);
-    config.testRegex = [ target ];
+    config.testRegex = [target];
   }
   process.env.NODE_ENV = 'test';
   // console.log('Jest config: ', config);
@@ -63,12 +63,12 @@ function test() {
 }
 
 function isFixed(file) {
-	return file.eslint != null && file.eslint.fixed;
+  return file.eslint != null && file.eslint.fixed;
 }
 
 function lint() {
   const hasFixFlag = process.argv.slice(2).includes('--fix');
-  return gulp.src(PATH.all, {base: './'})
+  return gulp.src(PATH.all, { base: './' })
     .pipe(eslint({
       configFile: '.eslintrc.js',
       fix: hasFixFlag,
@@ -90,5 +90,5 @@ gulp.task('server', server);
 gulp.task('test', test);
 gulp.task('watch', watch);
 gulp.task('build', build);
-gulp.task('doc:server', gulp.series('doc','server'));
-gulp.task('default', gulp.series('lint', 'test', 'doc','doc:server', 'watch'));
+gulp.task('doc:server', gulp.series('doc', 'server'));
+gulp.task('default', gulp.series('lint', 'test', 'doc', 'doc:server', 'watch'));

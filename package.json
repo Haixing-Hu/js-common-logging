@@ -4,12 +4,14 @@
   "description": "A simple JavaScript logging framework",
   "main": "dist/common-logging.min.js",
   "scripts": {
-    "build": "gulp build",
+    "build": "cross-env NODE_ENV=production gulp build",
+    "build:dev": "cross-env NODE_ENV=development gulp build",
     "test": "gulp test",
     "lint": "gulp lint",
     "doc": "gulp doc",
     "doc:server": "gulp doc:server",
-    "analyze": "USE_ANALYZER=true gulp build",
+    "analyze": "cross-env USE_ANALYZER=true NODE_ENV=production gulp build",
+    "analyze:dev": "cross-env USE_ANALYZER=true NODE_ENV=development gulp build",
     "es5": "./node_modules/.bin/check-es-version -e 5",
     "deploy": "yarn & gulp build && npm publish --registry='https://registry.npmjs.com/' --access public"
   },
@@ -30,6 +32,7 @@
   },
   "dependencies": {
     "deep-equal": "^2.0.5",
+    "fsevents": "^2.3.3",
     "json-beautify": "^1.1.1",
     "kind-of": "^6.0.3",
     "qs": "^6.11.0"
@@ -50,6 +53,7 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "babel-plugin-transform-object-hasown": "^1.1.0",
     "check-es-version": "^1.1.2",
+    "cross-env": "^7.0.3",
     "core-js": "^3.19.1",
     "eslint": "^8.12.0",
     "gulp": "^4.0.2",

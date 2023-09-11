@@ -17,30 +17,17 @@ const { merge } = require('webpack-merge');
 const commonConfig = {
   entry: resolve(__dirname, 'main.js'),
   output: {
-    filename: 'common-logging.min.js',
+    filename: 'common-logging.js',
     library: {
-      name: 'common-logging',
+      name: 'commonLogging',
       type: 'umd',
     },
     globalObject: 'this',
   },
   devtool: 'source-map',
-  mode: 'production',
+  mode: 'development',
   stats: 'summary',
   target: ['web', 'es5'],
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          compress: {
-            drop_debugger: true,
-            drop_console: false,
-          },
-        },
-      }),
-    ],
-  },
   module: {
     rules: [{
       test: /\.js$/,
@@ -59,6 +46,30 @@ const commonConfig = {
 };
 
 /**
+ * Configuration for production environment.
+ */
+const productionConfig = {
+  output: {
+    filename: 'common-logging.min.js',
+  },
+  devtool: 'source-map',
+  mode: 'production',
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_debugger: true,
+            drop_console: false,
+          },
+        },
+      }),
+    ],
+  },
+};
+
+/**
  * Module analysis configuration.
  */
 const analyzerConfig = {
@@ -67,4 +78,11 @@ const analyzerConfig = {
   ],
 };
 
-module.exports = (process.env.USE_ANALYZER ? merge(commonConfig, analyzerConfig) : commonConfig);
+let config = commonConfig;
+if (process.env.NODE_ENV === 'production') {
+  config = merge(config, productionConfig);
+}
+if (process.env.USE_ANALYZER) {
+  config = merge(config, analyzerConfig);
+}
+module.exports = config;
