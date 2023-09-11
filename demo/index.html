@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <title>Common Logging Demo</title>
+  <meta
+      name="description"
+      content="A demo to show the features of common-logging."
+  />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="../dist/common-logging.min.js"></script>
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<main>
+  <h1>Common Logging Demo</h1>
+  <form id="LogForm" class="code-container">
+    <code>
+      logger.
+      <select name="level" aria-label="Logging level" required>
+        <option value="TRACE">TRACE</option>
+        <option value="DEBUG">DEBUG</option>
+        <option value="INFO">INFO</option>
+        <option value="WARN">WARN</option>
+        <option value="ERROR">ERROR</option>
+      </select>
+      ("
+      <input
+          name="message"
+          type="text"
+          placeholder="Logging text"
+          aria-label="Logging text"
+          value="Hello world!"
+          required
+      />
+      ")
+    </code>
+    <button type="submit">Run</button>
+    <details>
+      <summary>More information...</summary>
+      Choose your level of logging and enter some text to output it to the console using common-logging.
+    </details>
+  </form>
+  <form id="SetLevel" class="code-container">
+    <code>
+      logger.setLevel("
+      <select name="level" aria-label="Logging level" required>
+        <option value="TRACE">TRACE</option>
+        <option value="DEBUG">DEBUG</option>
+        <option value="INFO">INFO</option>
+        <option value="WARN">WARN</option>
+        <option value="ERROR">ERROR</option>
+        <option value="ERROR">NONE</option>
+      </select>
+      ")
+    </code>
+    <button type="submit">Run</button>
+    <details>
+      <summary>More information...</summary>
+      Disable all logging below the given level.
+    </details>
+  </form>
+  <div class="code-container">
+    <code>
+      logger.enable()
+    </code>
+    <button id="EnableAllButton" type="button">Run</button>
+    <details>
+      <summary>More information...</summary>
+      Enables all logs - equivalent of <code>setLevel('TRACE')</code>.
+    </details>
+  </div>
+  <div class="code-container">
+    <code>
+      logger.disable()
+    </code>
+    <button id="DisableAllButton" type="button">Run</button>
+    <details>
+      <summary>More information...</summary>
+      Disables all logs - equivalent of <code>setLevel('NONE')</code>.
+    </details>
+  </div>
+  <h2>Logger State</h2>
+  <div id="LoggerState" class="code-container">
+    <label>
+      Current logging level
+      <input name="currentLevel" aria-label="Current logging level" readonly>
+    </label>
+    <details>
+      <summary>More information...</summary>
+      Uses the <code>getLevel()</code> method to display the current logging level.
+    </details>
+  </div>
+</main>
+</html>
