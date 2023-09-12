@@ -188,15 +188,76 @@ class Logger {
           // binds the private logging method of this object to the
           // corresponding logging method of this.appender.
           // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-          const args = [appender[m], appender, `[${level}]`];
+          let prefix = `[${level}] `;
           if (this._name) {
-            args.push(`${this._name} -`);
+            prefix += `${this._name} - `;
           }
-          this[m] = Function.prototype.bind.call(...args);
+          prefix += '%s';
+          this[m] = Function.prototype.bind.call(appender[m], appender, prefix);
         }
       }
     }
   }
+
+  /**
+   * Logs a message in the `TRACE` level.
+   *
+   * @param {String} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {Array} args
+   *     the array of arguments used to format the message.
+   * @private
+   */
+  trace(message, ...args) {}
+
+  /**
+   * Logs a message in the `DEBUG` level.
+   *
+   * @param {String} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {Array} args
+   *     the array of arguments used to format the message.
+   * @private
+   */
+  debug(message, ...args) {}
+
+  /**
+   * Logs a message in the `INFO` level.
+   *
+   * @param {String} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {Array} args
+   *     the array of arguments used to format the message.
+   * @private
+   */
+  info(message, ...args) {}
+
+  /**
+   * Logs a message in the `WARN` level.
+   *
+   * @param {String} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {Array} args
+   *     the array of arguments used to format the message.
+   * @private
+   */
+  warn(message, ...args) {}
+
+  /**
+   * Logs a message in the `ERROR` level.
+   *
+   * @param {String} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {Array} args
+   *     the array of arguments used to format the message.
+   * @private
+   */
+  error(message, ...args) {}
 
   /**
    * Gets the default logging level of all `Logger` instants.
@@ -228,7 +289,6 @@ class Logger {
 const logger = new Logger();
 
 export {
-  LOGGING_LEVELS,
   Logger,
   logger,
 };
