@@ -195,8 +195,10 @@ class Logger {
           //
           // Another way to preserve the correct source code location of calling
           // Logger's logging methods is to use the stack trace of the Error
-          // object. See: https://stackoverflow.com/questions/57436034/wrap-consol-log-with-bind-to-keep-caller-context
-          // and https://github.com/MrToph/stacklogger/
+          // object. But it's too heavy and significantly affects the performance.
+          // See: https://stackoverflow.com/questions/57436034/wrap-consol-log-with-bind-to-keep-caller-context
+          //      https://github.com/MrToph/stacklogger/
+          //      https://github.com/baryon/tracer
           //
           const prefix = this._getPrefix(level);
           this[m] = Function.prototype.bind.call(appender[m], appender, prefix);
