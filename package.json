@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "deep-equal": "^2.0.5",
-    "fsevents": "^2.3.3",
     "json-beautify": "^1.1.1",
     "kind-of": "^6.0.3",
     "qs": "^6.11.0"
@@ -53,8 +52,8 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "babel-plugin-transform-object-hasown": "^1.1.0",
     "check-es-version": "^1.1.2",
-    "cross-env": "^7.0.3",
     "core-js": "^3.19.1",
+    "cross-env": "^7.0.3",
     "eslint": "^8.12.0",
     "gulp": "^4.0.2",
     "gulp-connect": "^5.7.0",

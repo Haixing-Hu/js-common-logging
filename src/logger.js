@@ -6,36 +6,12 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-
-/**
- * A no-operation function.
- *
- * @author Haixing Hu
- * @private
- */
-const NOOP = () => {};
-
-/**
- * Predefined logging levels.
- *
- * @author Haixing Hu
- */
-const LOGGING_LEVELS = {
-  TRACE: 0,
-  DEBUG: 1,
-  INFO: 2,
-  WARN: 3,
-  ERROR: 4,
-  NONE: 5,
-};
-
-/**
- * The default logging level, which is `DEBUG`.
- *
- * @author Haixing Hu
- * @private
- */
-const DEFAULT_LOGGING_LEVEL = 'DEBUG';
+import {
+  NOOP,
+  LOGGING_LEVELS,
+  checkAppend,
+  checkLoggingLevel,
+} from './utils';
 
 /**
  * A simple logging class.
@@ -65,36 +41,109 @@ const DEFAULT_LOGGING_LEVEL = 'DEBUG';
  */
 class Logger {
   /**
+   * The default logging level, which is `DEBUG`.
+   *
+   * @private
+   */
+  static _defaultLevel = 'DEBUG';
+
+  /**
    * Construct a log object.
    *
+   * @param {String} name
+   *     The optional name of this logger. The default value of this argument
+   *     is an empty string.
    * @param {String} level
    *     Optional, indicating the log level of this object. The default value
-   *     of this argument is `DEFAULT_LOGGING_LEVEL`.
+   *     of this argument is the default logging level of all `Logger` instants.
    * @param {Object} appender
    *     Optional, indicating the content output pipe of the log. This object
    *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
    *     The default value of this argument is `console`.
    */
-  constructor(level = DEFAULT_LOGGING_LEVEL, appender = console) {
-    this._checkLoggingLevel(level);
-    this._checkAppend(appender);
-    this.appender = appender;
-    this.level = level;
+  constructor(name = '', appender = console, level = Logger._defaultLevel) {
+    if (typeof name !== 'string') {
+      throw new TypeError('The name of a logger must be a string, and empty string is allowed.');
+    }
+    checkAppend(appender);
+    checkLoggingLevel(level);
+    this._name = name;
+    this._level = level;
+    this._appender = appender;
     this._bindLoggingMethods(level, appender);
+  }
+
+  /**
+   * Get the name of this logger.
+   *
+   * @returns {String}
+   *     The name of this logger.
+   */
+  getName() {
+    return this._name;
+  }
+
+  /**
+   * Get the appender of this logger.
+   *
+   * @return {Object}
+   *     The appender of this logger.
+   */
+  getAppender() {
+    return this._appender;
+  }
+
+  /**
+   * Set up a new Appender.
+   *
+   * @param {Object} appender
+   *     The new Appender serves as the content output pipeline of the log.
+   *     This object must provide `trace`, `debug`, `info`, `warn` and `error`
+   *     methods.
+   */
+  setAppender(appender) {
+    checkAppend(appender);
+    this._bindLoggingMethods(this._level, appender);
+    this._appender = appender;
+  }
+
+  /**
+   * Get the logging level of this logger.
+   *
+   * @return {String}
+   *     The logging level of this logger. Possible return values are `TRACE`,
+   *     `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
+   */
+  getLevel() {
+    return this._level;
+  }
+
+  /**
+   * Set the logging level of this logger.
+   *
+   * @param {String} level
+   *     The new logging level. The optional levels are `TRACE`, `DEBUG`, `INFO`,
+   *     `WARN`, `ERROR`, and `NONE`.
+   */
+  setLevel(level) {
+    level = level.toUpperCase();
+    checkLoggingLevel(level);
+    this._bindLoggingMethods(level, this._appender);
+    this._level = level;
   }
 
   /**
    * Disable this logging object.
    */
   disable() {
-    this._bindLoggingMethods('NONE', this.appender);
+    this._bindLoggingMethods('NONE', this._appender);
   }
 
   /**
    * Enable this logging object.
    */
   enable() {
-    this._bindLoggingMethods(this.level, this.appender);
+    this._bindLoggingMethods(this._level, this._appender);
   }
 
   /**
@@ -108,91 +157,6 @@ class Logger {
       this.enable();
     } else {
       this.disable();
-    }
-  }
-
-  /**
-   * Get the appender of this logger.
-   *
-   * @return {Object}
-   *     The appender of this logger.
-   */
-  getAppender() {
-    return this.appender;
-  }
-
-  /**
-   * Set up a new Appender.
-   *
-   * @param {Object} appender
-   *     The new Appender serves as the content output pipeline of the log.
-   *     This object must provide `trace`, `debug`, `info`, `warn` and `error`
-   *     methods.
-   */
-  setAppender(appender) {
-    this._checkAppend(appender);
-    this._bindLoggingMethods(this.level, appender);
-    this.appender = appender;
-  }
-
-  /**
-   * Get the logging level of this logger.
-   *
-   * @return {String}
-   *     The logging level of this logger. Possible return values are `TRACE`,
-   *     `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
-   */
-  getLevel() {
-    return this.level;
-  }
-
-  /**
-   * Set the logging level of this logger.
-   *
-   * @param {String} level
-   *     The new logging level. The optional levels are `TRACE`, `DEBUG`, `INFO`,
-   *     `WARN`, `ERROR`, and `NONE`.
-   */
-  setLevel(level) {
-    level = level.toUpperCase();
-    this._checkLoggingLevel(level);
-    this._bindLoggingMethods(level, this.appender);
-    this.level = level;
-  }
-
-  /**
-   * Checks the validity of an appender.
-   *
-   * @param {Object} appender
-   *     The appender to be checked. If it is invalid, an `Error` will be thrown.
-   * @private
-   */
-  _checkAppend(appender) {
-    if (!appender) {
-      throw new Error('The appender for a logger cannot be `null` nor `undefined`.');
-    }
-    for (const level in LOGGING_LEVELS) {
-      if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
-        const methodName = level.toLowerCase();
-        if (!appender[methodName]) {
-          throw new Error(`The appender of this logger has no ${methodName}() method.`);
-        }
-      }
-    }
-  }
-
-  /**
-   * Checks the validity of a logging level.
-   *
-   * @param {String} level
-   *     The logging level to be checked. If it is invalid, an `Error` will be
-   *     thrown.
-   * @private
-   */
-  _checkLoggingLevel(level) {
-    if (LOGGING_LEVELS[level] === undefined) {
-      throw new RangeError(`Unknown logging level "${level}". `
-          + 'Possible values are："TRACE", "DEBUG", "INFO", "WARN", "ERROR", "NONE"。');
     }
   }
 
@@ -214,20 +178,45 @@ class Logger {
    */
   _bindLoggingMethods(level, appender) {
     const target = LOGGING_LEVELS[level];
-    for (const l in LOGGING_LEVELS) {
-      if (Object.hasOwn(LOGGING_LEVELS, l) && (l !== 'NONE')) {
-        const m = l.toLowerCase();
-        if (LOGGING_LEVELS[l] < target) {
+    for (const level in LOGGING_LEVELS) {
+      if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
+        const m = level.toLowerCase();
+        if (LOGGING_LEVELS[level] < target) {
           // binds the private logging method of this object to no-op
           this[m] = NOOP;
         } else {
           // binds the private logging method of this object to the
           // corresponding logging method of this.appender.
           // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-          this[m] = Function.prototype.bind.call(appender[m], appender, `[${l}]`);
+          const args = [appender[m], appender, `[${level}]`];
+          if (this._name) {
+            args.push(`${this._name} -`);
+          }
+          this[m] = Function.prototype.bind.call(...args);
         }
       }
     }
+  }
+
+  /**
+   * Gets the default logging level of all `Logger` instants.
+   *
+   * @return {String}
+   *     The default logging level of all `Logger` instants.
+   */
+  static getDefaultLevel() {
+    return Logger._defaultLevel;
+  }
+
+  /**
+   * Sets the default logging level of all `Logger` instants.
+   *
+   * @param {String} level
+   *     The new default logging level of all `Logger` instants.
+   */
+  static setDefaultLevel(level) {
+    checkLoggingLevel(level);
+    Logger._defaultLevel = level;
   }
 }
 
@@ -240,7 +229,6 @@ const logger = new Logger();
 
 export {
   LOGGING_LEVELS,
-  DEFAULT_LOGGING_LEVEL,
   Logger,
   logger,
 };
