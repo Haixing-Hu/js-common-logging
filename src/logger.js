@@ -11,6 +11,7 @@ import {
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
+  composeFirstArgument,
 } from './utils';
 
 /**
@@ -187,17 +188,52 @@ class Logger {
         } else {
           // binds the private logging method of this object to the
           // corresponding logging method of this.appender.
-          // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-          let prefix = `[${level}] `;
-          if (this._name) {
-            prefix += `${this._name} - `;
-          }
-          prefix += '%s';
+          //
+          // We use the `Function.prototype.bind` to preserve the actual source
+          // code location where the logging method is called.
+          // See: https://stackoverflow.com/questions/13815640/a-proper-wrapper-for-console-log-with-correct-line-number
+          //
+          // Another way to preserve the correct source code location of calling
+          // Logger's logging methods is to use the stack trace of the Error
+          // object. See: https://stackoverflow.com/questions/57436034/wrap-consol-log-with-bind-to-keep-caller-context
+          // and https://github.com/MrToph/stacklogger/
+          //
+          const prefix = this._getPrefix(level);
           this[m] = Function.prototype.bind.call(appender[m], appender, prefix);
+          // this[m] = Function.prototype.bind.call(this._fixFirstArguments, this, level, appender[m], appender);
         }
       }
     }
   }
+
+  _getPrefix(level) {
+    let prefix = `[${level}] `;
+    if (this._name) {
+      prefix += `${this._name} - `;
+    }
+    // Note that we add a string substitution pattern '%s' to the end of
+    // the prefix, since according to the specification of the `console`,
+    // the string substitution is taken on the first argument recursively.
+    // See: https://stackoverflow.com/questions/75160241/what-order-does-console-log-with-multiple-arguments-and-multiple-s-substitu#answer-75167070
+    //      https://console.spec.whatwg.org/#logger
+    //      https://console.spec.whatwg.org/#formatter
+    //
+    // But the `console` object of the Node.js does not support the recursive
+    // string substitution.
+    // See: https://nodejs.org/api/console.html#console_console_log_data_args
+    //  and https://nodejs.org/api/util.html#utilformatformat-args
+    prefix += '%s';
+    return prefix;
+  }
+
+  // _fixFirstArguments(level, method, appender, arg) {
+  //   const prefix = this._getPrefix(level);
+  //   if (arg === 'string') {
+  //     return Function.prototype.bind.call(method, appender, prefix + arg);
+  //   } else {
+  //     return Function.prototype.bind.call(method, appender, prefix, arg);
+  //   }
+  // }
 
   /**
    * Logs a message in the `TRACE` level.

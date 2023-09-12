@@ -68,9 +68,14 @@ function checkLoggingLevel(level) {
   }
 }
 
+function composeFirstArgument(func1, func2) {
+  return (...args) => func1(func2(args[0]), ...args.slice(1));
+}
+
 export {
   NOOP,
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
+  composeFirstArgument,
 }

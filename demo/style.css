@@ -100,9 +100,13 @@ details code {
   font-weight: 600;
 }
 
+main {
+  width: 100vw;
+}
+
 .code-container {
-  width: 80vw;
-  max-width: 800px;
+  width: 90vw;
+  max-width: 1000px;
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -22,11 +22,20 @@ function onSubmitDemoForm(event) {
   const form = event.currentTarget;
   const formData = new FormData(form);
   const message = formData.get('message');
+  const arg1 = formData.get('arg1');
+  const arg2 = formData.get('arg2');
   const level = formData.get('level');
-  console.info(`Submit a ${level} message: "${message}".`);
+  console.info(`Submit a ${level} message: "${message}", ${arg1}, ${arg2}.`);
   if (message && level) {
     const method = level.toLowerCase();
-    logger[method](message);
+    const args = [];
+    if (arg1) {
+      args.push(arg1);
+    }
+    if (arg2) {
+      args.push(arg2);
+    }
+    logger[method](message, ...args);
   }
 }
 function onSubmitSetLevelForm(event) {
