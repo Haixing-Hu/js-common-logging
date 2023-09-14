@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 import { Logger } from '../main';
-import CustomizedAppender from "./helper/customized-appender";
+import CustomizedAppender from './helper/customized-appender';
 
 /**
  * Unit test the `Logger` class, calling the default constructor will cause
@@ -20,8 +20,8 @@ describe('logger: constructor', () => {
     expect(() => {
       new Logger('', console, 'ERROR');
     }).toThrowWithMessage(
-        Error,
-        'The `Logger` instance can only be constructed by the '
+      Error,
+      'The `Logger` instance can only be constructed by the '
         + 'static method `Logger.getLogger()`.',
     );
   });
@@ -46,8 +46,8 @@ describe('logger: Logger.getLogger()', () => {
     expect(() => {
       Logger.getLogger(123);
     }).toThrowWithMessage(
-        TypeError,
-        'The name of a logger must be a string, and empty string is allowed.',
+      TypeError,
+      'The name of a logger must be a string, and empty string is allowed.',
     );
   });
   test('`Logger.getLogger()` must provide correct appender', () => {
@@ -70,8 +70,8 @@ describe('logger: Logger.getLogger()', () => {
     expect(() => {
       Logger.getLogger('MyLogger', wrongAppender);
     }).toThrowWithMessage(
-        Error,
-        'The appender of this logger has no error() method.',
+      Error,
+      'The appender of this logger has no error() method.',
     );
   });
 });
@@ -250,8 +250,8 @@ describe('logger: set logging level', () => {
     expect(() => {
       Logger.getLogger('MyLogger2', console, 'XXX');
     }).toThrowWithMessage(
-        RangeError,
-        'Unknown logging level "XXX". '
+      RangeError,
+      'Unknown logging level "XXX". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
     );
   });
@@ -285,8 +285,8 @@ describe('logger: set logging level', () => {
     expect(() => {
       logger.setLevel('YYYY');
     }).toThrowWithMessage(
-        RangeError,
-        'Unknown logging level "YYYY". '
+      RangeError,
+      'Unknown logging level "YYYY". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
     );
   });
@@ -322,8 +322,8 @@ describe('logger: set/get default logging level', () => {
     expect(() => {
       Logger.setDefaultLevel('YYYY');
     }).toThrowWithMessage(
-        RangeError,
-        'Unknown logging level "YYYY". '
+      RangeError,
+      'Unknown logging level "YYYY". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
     );
   });
@@ -350,8 +350,8 @@ describe('logger: set/reset all logging level', () => {
     expect(() => {
       Logger.setDefaultLevel('YYYY');
     }).toThrowWithMessage(
-        RangeError,
-        'Unknown logging level "YYYY". '
+      RangeError,
+      'Unknown logging level "YYYY". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
     );
   });

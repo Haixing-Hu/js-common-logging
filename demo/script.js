@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 const Logger = commonLogging.Logger;
-const logger = new Logger('MyLogger');
+const logger = Logger.getLogger('MyLogger');
 
 function updateLogStateForm() {
   const LoggerState = document.getElementById('LoggerState');

@@ -79,4 +79,4 @@ export {
   checkAppend,
   checkLoggingLevel,
   composeFirstArgument,
-}
+};

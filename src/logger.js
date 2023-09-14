@@ -451,6 +451,7 @@ class Logger {
    *     the array of arguments used to format the message.
    * @private
    */
+  // eslint-disable-next-line no-unused-vars
   trace(message, ...args) {}
 
   /**
@@ -463,6 +464,7 @@ class Logger {
    *     the array of arguments used to format the message.
    * @private
    */
+  // eslint-disable-next-line no-unused-vars
   debug(message, ...args) {}
 
   /**
@@ -475,6 +477,7 @@ class Logger {
    *     the array of arguments used to format the message.
    * @private
    */
+  // eslint-disable-next-line no-unused-vars
   info(message, ...args) {}
 
   /**
@@ -487,6 +490,7 @@ class Logger {
    *     the array of arguments used to format the message.
    * @private
    */
+  // eslint-disable-next-line no-unused-vars
   warn(message, ...args) {}
 
   /**
@@ -499,6 +503,7 @@ class Logger {
    *     the array of arguments used to format the message.
    * @private
    */
+  // eslint-disable-next-line no-unused-vars
   error(message, ...args) {}
 }
 

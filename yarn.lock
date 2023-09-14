@@ -1049,10 +1049,10 @@
   dependencies:
     is-negated-glob "^1.0.0"
 
-"@haixing_hu/eslint-config@^1.0.0":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@haixing_hu/eslint-config/-/eslint-config-1.0.3.tgz#1162d0103065ea743c0e26bf9b63b215f9a638d4"
-  integrity sha512-dEWDB/Y02gTBw2D4MHr4ub+sR5XuDWaY30JydlKJWjeK2OAzio1wIl00I5AZ0C7yQFL5F9FyvhiW9aMtq2jJxA==
+"@haixing_hu/eslint-config@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.npmjs.org/@haixing_hu/eslint-config/-/eslint-config-1.0.4.tgz#a6b1b0814b9e304e728366ed9219bd73d7186637"
+  integrity sha512-FDIwVZsBMgGlbynZQ93omMxV6zJx/Ca3nkGOufhYZh+itd6bE006o+3JdudCxbdSY6CHaAZyqxGHMu2PWwNjsw==
   dependencies:
     "@babel/core" "^7.16.0"
     "@babel/eslint-parser" "^7.17.0"

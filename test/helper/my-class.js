@@ -6,12 +6,18 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Logger from './src/logger';
-import Log from './src/log';
-import HasLogger from './src/has-logger';
+import { HasLogger, Log } from '../../main';
 
-export {
-  Logger,
-  Log,
-  HasLogger,
-};
+@HasLogger
+class MyClass {
+  foo() {
+    this.logger.debug('This is MyClass.foo()');
+  }
+
+  @Log
+  add(x, y) {
+    this.logger.info('Add %d and %d', x, y);
+  }
+}
+
+export default MyClass;

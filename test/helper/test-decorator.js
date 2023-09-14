@@ -12,15 +12,18 @@ function Model(Class) {
 }
 
 function Func(target, name, descriptor) {
-  console.log('Func: target = ', target,
-      ' target.constructor = ', target.constructor,
-      ' name = ', name,
-      ' descriptor = ', descriptor);
+  console.log('Func: target = ',
+    target,
+    ' target.constructor = ',
+    target.constructor,
+    ' name = ',
+    name,
+    ' descriptor = ',
+    descriptor);
 }
 
 @Model
-class Test{
-
+class Test {
   @Func
   hello() {
     console.log('hello');

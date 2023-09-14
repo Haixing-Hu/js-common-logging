@@ -6,10 +6,9 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import { Log } from '../../src/log';
+import { Log } from '../../main';
 
 export default class Foo {
-
   constructor() {
     console.log('CONSOLE - Foo.constructor');
   }
