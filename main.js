@@ -6,11 +6,10 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import { logger, Logger } from './src/logger';
+import Logger from './src/logger';
+import Log from './src/log';
 
 export {
-  logger,
   Logger,
+  Log,
 }
-
-export default logger;

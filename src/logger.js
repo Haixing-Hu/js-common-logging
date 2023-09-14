@@ -11,8 +11,50 @@ import {
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
-  composeFirstArgument,
-} from './utils';
+} from './logger-utils';
+
+/**
+ * The default logging level of all `Logger` instances, which is `DEBUG`.
+ *
+ * @private
+ * @author Haixing Hu
+ */
+let __defaultLevel = 'DEBUG';
+
+/**
+ * The default log appender of all `Logger` instances, which is `console`.
+ *
+ * @private
+ * @author Haixing Hu
+ */
+let __defaultAppender = console;
+
+/**
+ * The map of all `Logger` instances.
+ *
+ * This value maps the name of a `Logger` instance to its instance.
+ *
+ * @type {Map<String, Logger>}
+ * @private
+ * @author Haixing Hu
+ */
+const __loggerMap = new Map();
+
+/**
+ * Indicates whether the `Logger` instance is under internal constructing.
+ *
+ * Many other languages include the capability to mark a constructor as private,
+ * which prevents the class from being instantiated outside the class itself,
+ * such taht you can only use static factory methods that create instances, or
+ * not be able to create instances at all. JavaScript does not have a native way
+ * to do this, but it can be accomplished by using a private static flag.
+ *
+ * @type {boolean}
+ * @private
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields#simulating_private_constructors
+ * @author Haixing Hu
+ */
+let __isInternalConstructing = false;
 
 /**
  * A simple logging class.
@@ -42,32 +84,194 @@ import {
  */
 class Logger {
   /**
-   * The default logging level, which is `DEBUG`.
+   * Gets the `Logger` instance of the specified name, or constructs a new
+   * `Logger` instance if it does not exist.
    *
-   * @private
+   * @param {String} name
+   *    The name of the `Logger` instance to be retrieved.
+   * @param {Object} appender
+   *     Optional, indicating the content output pipe of the log. This object
+   *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
+   *     If this argument is `undefined`, the appender of the existing `Logger`
+   *     instance will not be changed, and the default appender will be used
+   *     to construct a new `Logger` instance if it does not exist.
+   * @param {String} level
+   *     Optional, indicating the logging level of this object. If this argument
+   *     is `undefined`, the logging level of the existing `Logger` instance
+   *     will not be changed, and the default logging level will be used to
+   *     construct a new `Logger` instance if it does not exist.
+   * @return {Logger}
+   *     The `Logger` instance of the specified name, which either be the
+   *     existing one or a newly constructed one.
    */
-  static _defaultLevel = 'DEBUG';
+  static getLogger(name = '', appender = undefined, level = undefined) {
+    if (typeof name !== 'string') {
+      throw new TypeError('The name of a logger must be a string, and empty string is allowed.');
+    }
+    let logger = __loggerMap.get(name);
+    if (logger === undefined) {
+      // sets the internally constructing flag before constructing a instance
+      __isInternalConstructing = true;
+      logger = new Logger(name, appender, level);
+      // clear the internally constructing flag after constructing the new instance
+      __isInternalConstructing = false;
+      __loggerMap.set(name, logger);
+    } else {
+      if (appender !== undefined) {
+        logger.setAppender(appender);
+      }
+      if (level !== undefined) {
+        logger.setLevel(level);
+      }
+    }
+    return logger;
+  }
+
+  /**
+   * Gets the default logging level of all `Logger` instants.
+   *
+   * @return {String}
+   *     The default logging level of all `Logger` instants.
+   * @see {@link Logger.setDefaultLevel}
+   * @see {@link Logger.setAllLevels}
+   * @see {@link Logger.resetAllLevels}
+   */
+  static getDefaultLevel() {
+    return __defaultLevel;
+  }
+
+  /**
+   * Sets the default logging level of all `Logger` instants.
+   *
+   * @param {String} level
+   *     The new default logging level of all `Logger` instants.
+   * @see {@link Logger.getDefaultLevel}
+   * @see {@link Logger.setAllLevels}
+   * @see {@link Logger.resetAllLevels}
+   */
+  static setDefaultLevel(level) {
+    checkLoggingLevel(level);
+    __defaultLevel = level;
+  }
+
+  /**
+   * Sets the logging level of all `Logger` instants.
+   *
+   * @param {String} level
+   *    The new logging level of all `Logger` instants. The possible levels are
+   *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
+   * @see {@link Logger.getDefaultLevel}
+   * @see {@link Logger.setDefaultLevel}
+   * @see {@link Logger.resetAllLevels}
+   */
+  static setAllLevels(level) {
+    level = level.toUpperCase();
+    checkLoggingLevel(level);
+    for (const logger of __loggerMap.values()) {
+      logger.setLevel(level);
+    }
+  }
+
+  /**
+   * Sets the logging level of all `Logger` instants to the default logging level.
+   *
+   * @see {@link Logger.getDefaultLevel}
+   * @see {@link Logger.setDefaultLevel}
+   * @see {@link Logger.setAllLevels}
+   */
+  static resetAllLevels() {
+    Logger.setAllLevels(__defaultLevel);
+  }
+
+  /**
+   * Gets the default log appender of all `Logger` instants.
+   *
+   * @return {Object}
+   *     The default log appender of all `Logger` instants.
+   * @see {@link Logger.setDefaultAppender}
+   * @see {@link Logger.setAllAppenders}
+   * @see {@link Logger.resetAllAppenders}
+   */
+  static getDefaultAppender() {
+    return __defaultAppender;
+  }
+
+  /**
+   * Sets the default log appender of all `Logger` instants.
+   *
+   * @param {Object} appender
+   *     The new default log appender of all `Logger` instants.
+   * @see {@link Logger.getDefaultAppender}
+   * @see {@link Logger.setAllAppenders}
+   * @see {@link Logger.resetAllAppenders}
+   */
+  static setDefaultAppender(appender) {
+    checkAppend(appender);
+    __defaultAppender = appender;
+  }
+
+  /**
+   * Sets the appender of all `Logger` instants.
+   *
+   * @param {Object} appender
+   *     The new appender to be set, indicating the content output pipe of the
+   *     log. This object must provide `trace`, `debug`, `info`, `warn` and
+   *     `error` methods.
+   * @see {@link Logger.getDefaultAppender}
+   * @see {@link Logger.setDefaultAppender}
+   * @see {@link Logger.resetAllAppenders}
+   */
+  static setAllAppenders(appender) {
+    checkAppend(appender);
+    for (const logger of __loggerMap.values()) {
+      logger.setAppender(appender);
+    }
+  }
+
+  /**
+   * Sets the appender of all `Logger` instants to the default appender.
+   *
+   * @see {@link Logger.getDefaultAppender}
+   * @see {@link Logger.setDefaultAppender}
+   * @see {@link Logger.setAllAppenders}
+   */
+  static resetAllAppenders() {
+    Logger.setAllAppenders(__defaultAppender);
+  }
 
   /**
    * Construct a log object.
    *
+   * **NOTE**: Do NOT call this constructor directly. Use the static method
+   * `Logger.getLogger()` instead.
+   *
    * @param {String} name
    *     The optional name of this logger. The default value of this argument
    *     is an empty string.
-   * @param {String} level
-   *     Optional, indicating the log level of this object. The default value
-   *     of this argument is the default logging level of all `Logger` instants.
    * @param {Object} appender
    *     Optional, indicating the content output pipe of the log. This object
    *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
-   *     The default value of this argument is `console`.
+   *     The default value of this argument is `Logger.getDefaultAppender()`.
+   * @param {String} level
+   *     Optional, indicating the log level of this object. The default value
+   *     of this argument is `Logger.getDefaultLevel()`.
+   * @see {@link Logger.getLogger}
    */
-  constructor(name = '', appender = console, level = Logger._defaultLevel) {
-    if (typeof name !== 'string') {
-      throw new TypeError('The name of a logger must be a string, and empty string is allowed.');
+  constructor(name, appender, level) {
+    if (!__isInternalConstructing) {
+      throw new Error('The `Logger` instance can only be constructed by the '
+          + 'static method `Logger.getLogger()`.');
     }
-    checkAppend(appender);
-    checkLoggingLevel(level);
+    if (appender === undefined) {
+      appender = __defaultAppender;
+    } else {
+      checkAppend(appender);
+    }
+    if (level === undefined) {
+      level = __defaultLevel;
+    } else {
+      checkLoggingLevel(level);
+    }
     this._name = name;
     this._level = level;
     this._appender = appender;
@@ -296,39 +500,6 @@ class Logger {
    * @private
    */
   error(message, ...args) {}
-
-  /**
-   * Gets the default logging level of all `Logger` instants.
-   *
-   * @return {String}
-   *     The default logging level of all `Logger` instants.
-   */
-  static getDefaultLevel() {
-    return Logger._defaultLevel;
-  }
-
-  /**
-   * Sets the default logging level of all `Logger` instants.
-   *
-   * @param {String} level
-   *     The new default logging level of all `Logger` instants.
-   */
-  static setDefaultLevel(level) {
-    checkLoggingLevel(level);
-    Logger._defaultLevel = level;
-  }
 }
 
-/**
- * A predefined default constructed logger object.
- *
- * @author Haixing Hu
- */
-const logger = new Logger();
-
-export {
-  Logger,
-  logger,
-};
-
-export default logger;
+export default Logger;

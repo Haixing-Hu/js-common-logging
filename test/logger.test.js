@@ -7,14 +7,82 @@
  *
  ******************************************************************************/
 import { Logger } from '../main';
+import CustomizedAppender from "./helper/customized-appender";
 
 /**
- * Unit test the `Logger` class,, using the default console as output.
+ * Unit test the `Logger` class, calling the default constructor will cause
+ * error.
+ *
+ * @author Haixing Hu
+ */
+describe('logger: constructor', () => {
+  test('Cannot call the constructor directly', () => {
+    expect(() => {
+      new Logger('', console, 'ERROR');
+    }).toThrowWithMessage(
+        Error,
+        'The `Logger` instance can only be constructed by the '
+        + 'static method `Logger.getLogger()`.',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class, `Logger.getLogger()` will returns the same
+ * instance for the same name.
+ *
+ * @author Haixing Hu
+ */
+describe('logger: Logger.getLogger()', () => {
+  test('`Logger.getLogger()` returns the same instance for the same name', () => {
+    const logger1 = Logger.getLogger('MyLogger');
+    const logger2 = Logger.getLogger('MyLogger');
+    expect(logger1).toBe(logger2);
+    const logger3 = Logger.getLogger();
+    const logger4 = Logger.getLogger();
+    expect(logger3).toBe(logger4);
+  });
+  test('`Logger.getLogger()` must provide string as name', () => {
+    expect(() => {
+      Logger.getLogger(123);
+    }).toThrowWithMessage(
+        TypeError,
+        'The name of a logger must be a string, and empty string is allowed.',
+    );
+  });
+  test('`Logger.getLogger()` must provide correct appender', () => {
+    const correctAppender = {
+      trace: () => {},
+      debug: () => {},
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+    };
+    const wrongAppender = {
+      trace: () => {},
+      debug: () => {},
+      info: () => {},
+      warn: () => {},
+    };
+    const logger = Logger.getLogger('MyLogger-TestAppender', correctAppender);
+    expect(logger.getAppender())
+      .toBe(correctAppender);
+    expect(() => {
+      Logger.getLogger('MyLogger', wrongAppender);
+    }).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no error() method.',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class, using the default console as output.
  *
  * @author Haixing Hu
  */
 describe('logger: Use console', () => {
-  const logger = new Logger();
+  const logger = Logger.getLogger();
   test('logger.trace', () => {
     const arg1 = 'hello';
     const arg2 = {
@@ -62,32 +130,6 @@ describe('logger: Use console', () => {
   });
 });
 
-class CustomizedAppender {
-  constructor() {
-    this.logs = [];
-  }
-  trace(...args) {
-    this.logs.push({ type: 'TRACE', args });
-    console.trace(...args);
-  }
-  debug(...args) {
-    this.logs.push({ type: 'DEBUG', args });
-    console.debug(...args);
-  }
-  info(...args) {
-    this.logs.push({ type: 'INFO', args });
-    console.info(...args);
-  }
-  warn(...args) {
-    this.logs.push({ type: 'WARN', args });
-    console.warn(...args);
-  }
-  error(...args) {
-    this.logs.push({ type: 'ERROR', args });
-    console.error(...args);
-  }
-}
-
 /**
  * Unit test the `Logger` class, using custom `Appender` as output.
  *
@@ -95,7 +137,7 @@ class CustomizedAppender {
  */
 describe('logger: Use customized appender', () => {
   const appender = new CustomizedAppender();
-  const logger = new Logger('MyLogger', appender, 'TRACE');
+  const logger = Logger.getLogger('MyLogger', appender, 'TRACE');
   test('logger.trace', () => {
     const arg1 = 'hello';
     const arg2 = {
@@ -189,9 +231,9 @@ describe('logger: Use customized appender', () => {
  * @author Haixing Hu
  */
 describe('logger: set logging level', () => {
-  test('correct logging level in constructor', () => {
+  test('correct logging level in getLogger', () => {
     const appender = new CustomizedAppender();
-    const logger = new Logger('MyLogger1', appender, 'ERROR');
+    const logger = Logger.getLogger('MyLogger1', appender, 'ERROR');
     logger.trace('TRACE level should not be logged');
     logger.debug('DEBUG level should not be logged');
     logger.info('INFO level should not be logged');
@@ -204,9 +246,9 @@ describe('logger: set logging level', () => {
       'ERROR level should be logged',
     ]);
   });
-  test('wrong logging level in constructor', () => {
+  test('wrong logging level in getLogger', () => {
     expect(() => {
-      new Logger('MyLogger2', console, 'XXX');
+      Logger.getLogger('MyLogger2', console, 'XXX');
     }).toThrowWithMessage(
         RangeError,
         'Unknown logging level "XXX". '
@@ -215,7 +257,7 @@ describe('logger: set logging level', () => {
   });
   test('correct logging level in setLevel()', () => {
     const appender = new CustomizedAppender();
-    const logger = new Logger('MyLogger3', appender, 'DEBUG');
+    const logger = Logger.getLogger('MyLogger3', appender, 'DEBUG');
     logger.debug('DEBUG level should be logged');
     expect(appender.logs.length).toBe(1);
     expect(appender.logs[0]).toEqual({
@@ -239,7 +281,7 @@ describe('logger: set logging level', () => {
     });
   });
   test('wrong logging level in setLevel()', () => {
-    const logger = new Logger();
+    const logger = Logger.getLogger();
     expect(() => {
       logger.setLevel('YYYY');
     }).toThrowWithMessage(
@@ -247,5 +289,82 @@ describe('logger: set logging level', () => {
         'Unknown logging level "YYYY". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
     );
+  });
+});
+
+/**
+ * Unit test the `Logger` class, set/get default logging level.
+ *
+ * @author Haixing Hu
+ */
+describe('logger: set/get default logging level', () => {
+  test('set correct default logging level', () => {
+    Logger.setDefaultLevel('ERROR');
+    const appender = new CustomizedAppender();
+    const logger = Logger.getLogger('MyLogger4', appender);
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(1);
+    expect(appender.logs[0].type).toBe('ERROR');
+    expect(appender.logs[0].args).toEqual([
+      '[ERROR] MyLogger4 - %s',
+      'ERROR level should be logged',
+    ]);
+  });
+  test('get default logging level', () => {
+    const level = Logger.getDefaultLevel();
+    expect(level).toBe('ERROR');
+  });
+  test('wrong logging level in Logger.setDefaultLevel()', () => {
+    expect(() => {
+      Logger.setDefaultLevel('YYYY');
+    }).toThrowWithMessage(
+        RangeError,
+        'Unknown logging level "YYYY". '
+        + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class, set/reset all logging levels.
+ *
+ * @author Haixing Hu
+ */
+describe('logger: set/reset all logging level', () => {
+  test('correct logging level in Logger.setAllLevels()', () => {
+    const l1 = Logger.getLogger('l1');
+    const l2 = Logger.getLogger('l2');
+    const l3 = Logger.getLogger('l3');
+    const logger = Logger.getLogger();
+    Logger.setAllLevels('ERROR');
+    expect(l1.getLevel()).toBe('ERROR');
+    expect(l2.getLevel()).toBe('ERROR');
+    expect(l3.getLevel()).toBe('ERROR');
+    expect(logger.getLevel()).toBe('ERROR');
+  });
+  test('wrong logging level in Logger.setAllLevels()', () => {
+    expect(() => {
+      Logger.setDefaultLevel('YYYY');
+    }).toThrowWithMessage(
+        RangeError,
+        'Unknown logging level "YYYY". '
+        + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
+    );
+  });
+  test('reset all logging levels', () => {
+    const l1 = Logger.getLogger('l1');
+    const l2 = Logger.getLogger('l2');
+    const l3 = Logger.getLogger('l3');
+    const logger = Logger.getLogger();
+    const defaultLevel = Logger.getDefaultLevel();
+    Logger.resetAllLevels();
+    expect(l1.getLevel()).toBe(defaultLevel);
+    expect(l2.getLevel()).toBe(defaultLevel);
+    expect(l3.getLevel()).toBe(defaultLevel);
+    expect(logger.getLevel()).toBe(defaultLevel);
   });
 });

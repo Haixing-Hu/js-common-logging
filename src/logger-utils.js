@@ -43,7 +43,8 @@ function checkAppend(appender) {
   for (const level in LOGGING_LEVELS) {
     if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
       const methodName = level.toLowerCase();
-      if (!appender[methodName]) {
+      const method = appender[methodName];
+      if (typeof method !== 'function') {
         throw new Error(`The appender of this logger has no ${methodName}() method.`);
       }
     }
