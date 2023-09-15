@@ -28,6 +28,9 @@ const commonConfig = {
   mode: 'development',
   stats: 'summary',
   target: ['web', 'es5'],
+  externals: {
+    'vue': 'vue',
+  },
   module: {
     rules: [{
       test: /\.js$/,

@@ -1,6 +1,6 @@
 {
   "name": "@haixing_hu/common-logging",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A simple JavaScript logging framework",
   "main": "dist/common-logging.min.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "doc:server": "gulp doc:server",
     "analyze": "cross-env USE_ANALYZER=true NODE_ENV=production gulp build",
     "analyze:dev": "cross-env USE_ANALYZER=true NODE_ENV=development gulp build",
-    "es5": "./node_modules/.bin/check-es-version -e 5",
+    "es5": "check-es-version -e 5 -s true",
     "deploy": "yarn & gulp build && npm publish --registry='https://registry.npmjs.com/' --access public"
   },
   "author": "Haixing Hu",
