@@ -29,7 +29,12 @@ const commonConfig = {
   stats: 'summary',
   target: ['web', 'es5'],
   externals: {
-    'vue': 'vue',
+    vue: {
+      commonjs: 'vue',
+      commonjs2: 'vue',
+      amd: 'vue',
+      root: 'Vue',
+    },
   },
   module: {
     rules: [{
