@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 import { mount } from '@vue/test-utils';
-import { Logger } from '../main';
+import { Logger } from '../src';
 import CustomizedAppender from './helper/customized-appender';
 import Foo from './helper/foo';
 import Hello from './helper/hello-vue';

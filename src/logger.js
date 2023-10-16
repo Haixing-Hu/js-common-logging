@@ -27,7 +27,7 @@ let __defaultLevel = 'DEBUG';
  * @private
  * @author Haixing Hu
  */
-let __defaultAppender = console;
+let __defaultAppender = (window?.console ? window.console : console);
 
 /**
  * The map of all `Logger` instances.

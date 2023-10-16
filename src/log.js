@@ -6,43 +6,45 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Vue from 'vue';
 import Logger from './logger';
+import { VUE3_CLASS_COMPONENT_DECORATORS_KEY } from './metadata-keys';
 
 /**
- * Names of hook functions in the lifecycle of Vue.
+ * The names of special functions of Vue components.
  *
- * @author Haixing Hu
+ * @type {string[]}
  * @private
+ * @author Haixing Hu
  */
-const VUE_LIFECYCLE_HOOKS = [
+const VUE_FUNCTIONS = [
+  // The names of lifecycle hooks of Vue components.
   'beforeCreate',
   'created',
   'beforeMount',
   'mounted',
   'beforeUpdate',
   'updated',
-  'activated',
-  'deactivated',
   'beforeUnmount',
   'unmounted',
-  'errorCaptured',  // 2.5
-  'renderTracked',
-  'renderTriggered',
-  'serverPrefetch', // 2.6
-  'beforeDestroy',
-  'destroyed',
+  'errorCaptured',
+  'renderTracked',    // Dev only
+  'renderTriggered',  // Dev only
+  'activated',
+  'deactivated',
+  'serverPrefetch',   // SSR only
+  // The names of special functions in the options API Vue components.
+  'render',
 ];
 
 /**
  * Print tracing logs for class methods.
  *
- * @param {String} className
- *     The name of a class.
- * @param {String} methodName
- *     The name of a method of the class.
- * @param {Array} args
- *     The calling arguments of the method.
+ * @param {string} className
+ *     The name of the class the decorated method belongs to.
+ * @param {string} methodName
+ *     The name of the decorated method..
+ * @param {array} args
+ *     The calling arguments of the decorated method.
  * @author Haixing Hu
  * @private
  */
@@ -69,7 +71,7 @@ function printMethodLog(className, methodName, args) {
 function vueLogDecorator(options, key) {
   // If the method decorated by the decorator is a Vue's life cycle hook function,
   // Then `col` is `options`; otherwise `col` is `options.methods`
-  const col = (VUE_LIFECYCLE_HOOKS.includes(key) ? options : options.methods);
+  const col = (VUE_FUNCTIONS.includes(key) ? options : options.methods);
   const originalMethod = col[key];
   col[key] = function logWrapperMethod(...args) {
     printMethodLog(options.name, key, args);
@@ -99,39 +101,37 @@ function vueLogDecorator(options, key) {
  * person.eat(meal);   // 日志中将会打印此方法调用的签名
  * ```
  *
- * @param {Function} target
- *     The prototype of the class to which the target object belongs.
- * @param {String} name
- *     The name of the target object.
- * @param {Object} descriptor
- *     The original property descriptor of the target object.
- * @returns
- *     The modified attribute descriptor of the target object.
+ * @param {function} target
+ *     The method being decorated.
+ * @param {object} context
+ *     the context object containing information about the method to be decorated.
+ * @return {function}
+ *     The decorated method.
  * @author Haixing Hu
  */
-export function Log(target, name, descriptor) {
-  const Class = target.constructor;
-  if (target instanceof Vue) {
-    // Derived classes of Vue must be treated specially.
-    // Refer to the implementation of the `createDecorator()` method of
-    // `vue-class-component`
-    if (!Class.__decorators__) {
-      Object.defineProperty(Class, '__decorators__', {
-        configurable: true,
-        enumerable: false,
-        value: [],
-      });
-    }
-    Class.__decorators__.push((options) => vueLogDecorator(options, name));
-  } else {
-    // For global functions, handle it normally
-    const originalMethod = descriptor.value;
-    descriptor.value = function wrapperMethod(...args) {
-      printMethodLog(Class.name, name, args);
-      return originalMethod.call(this, ...args);
-    };
+export function Log(target, context) {
+  if (context === null || typeof context !== 'object') {
+    throw new TypeError('The context must be an object.');
   }
-  return descriptor;
+  if (typeof target !== 'function' || context.kind !== 'method') {
+    throw new TypeError('The `@Log` can only decorate a class method.');
+  }
+  // decorate the class-style Vue component
+  // see the `createDecorator()` function in `@haixing_hu/vue3-class-component`
+  const metadata = context.metadata;
+  metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY] ??= [];
+  metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY].push(
+      (Class, instance, options) => vueLogDecorator(options, context.name),
+  );
+  // decorate the original method
+  function decoratedMethod(...args) {
+    const prototype = Object.getPrototypeOf(this);
+    const Class = prototype.constructor;
+    const className = Class.name;
+    printMethodLog(className, context.name, args);
+    return target.apply(this, args);
+  }
+  return decoratedMethod;
 }
 
 export default Log;

@@ -6,7 +6,7 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import { Log } from '../../main';
+import { Log } from '../../src';
 
 export default class Foo {
   constructor() {

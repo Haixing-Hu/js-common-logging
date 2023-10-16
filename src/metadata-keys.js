@@ -6,10 +6,10 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-module.exports = {
-  root: true,
-  parser: "@babel/eslint-parser",
-  extends: [
-    '@haixing_hu/eslint-config',
-  ],
+const LOGGER_KEY = '__common_logging_logger__';
+const VUE3_CLASS_COMPONENT_DECORATORS_KEY = '__vue3_class_component_decorators__';
+
+export {
+  LOGGER_KEY,
+  VUE3_CLASS_COMPONENT_DECORATORS_KEY,
 };

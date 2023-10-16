@@ -48,20 +48,27 @@ import Logger from './logger';
  * **NOTE**: the order of the decorators is IMPORTANT. The `@HasLogger` decorator
  * must be placed **AFTER** the `@Component` decorator.
  *
- * @param {Function} Class
- *     the constructor of the class to be decorated.
- * @return {Function}
- *     the decorated class constructor.
+ * @param {function} Class
+ *     the target class to be decorated.
+ * @param {object} context
+ *     the context object containing information about the class to be decorated.
+ * @return {function}
+ *     the new constructor of the decorated class.
  * @author Haixing Hu
  */
-function HasLogger(Class) {
-  if (typeof Class !== 'function') {
-    throw TypeError('The @HasLogger decorator must be used on a class.');
+function HasLogger(Class, context) {
+  if (context === null || typeof context !== 'object') {
+    throw new TypeError('The context must be an object.');
+  }
+  if (typeof Class !== 'function' || context.kind !== 'class') {
+    throw new TypeError('The `@HasLogger` can only decorate a class.');
   }
   if (Class.prototype.logger) {
     throw new Error('The @HasLogger decorator can only be used once on a class.');
   }
-  Class.prototype.logger = Logger.getLogger(Class.name);
+  // add the logger to the class prototype
+  Class.prototype.logger = Logger.getLogger(context.name);
+  return Class;
 }
 
 export default HasLogger;

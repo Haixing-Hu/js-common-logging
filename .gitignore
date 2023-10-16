@@ -131,3 +131,6 @@ dist
 
 # Mac OS files
 .DS_Store
+
+# API documents
+doc

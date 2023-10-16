@@ -6,16 +6,15 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { HasLogger, Log } from '../../main';
+import { Component, toVue } from '@haixing_hu/vue3-class-component';
+import { HasLogger, Log } from '../../src';
 
 // Encapsulate the Vue component to be tested
 @HasLogger    // Note the order of the decorators is INCORRECT
 @Component({
   template: '<p>{{ message }}</p>',
 })
-export default class HelloWithLoggerWrongOrder extends Vue {
+class HelloWithLoggerWrongOrder {
   message = 'Hello World!';
 
   @Log
@@ -39,3 +38,4 @@ export default class HelloWithLoggerWrongOrder extends Vue {
     return (x + y);
   }
 }
+export default toVue(HelloWithLoggerWrongOrder);

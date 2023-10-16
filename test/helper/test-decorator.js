@@ -30,7 +30,6 @@ class Test {
   }
 }
 
-
 /**
  * Unit test `@Log` decorator.
  *

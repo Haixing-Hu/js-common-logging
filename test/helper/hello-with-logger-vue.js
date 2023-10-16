@@ -6,16 +6,15 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { HasLogger, Log } from '../../main';
+import { Component, toVue } from '@haixing_hu/vue3-class-component';
+import { HasLogger, Log } from '../../src';
 
 // Encapsulate the Vue component to be tested
 @Component({
   template: '<p>{{ message }}</p>',
 })
 @HasLogger
-export default class HelloWithLogger extends Vue {
+class HelloWithLogger {
   message = 'Hello World!';
 
   @Log
@@ -39,3 +38,5 @@ export default class HelloWithLogger extends Vue {
     return (x + y);
   }
 }
+
+export default toVue(HelloWithLogger);

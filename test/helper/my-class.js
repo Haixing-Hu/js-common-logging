@@ -6,7 +6,7 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import { HasLogger, Log } from '../../main';
+import { HasLogger, Log } from '../../src';
 
 @HasLogger
 class MyClass {

@@ -6,15 +6,14 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import { Log } from '../../main';
+import { Component, toVue } from '@haixing_hu/vue3-class-component';
+import { Log } from '../../src';
 
 // Encapsulate the Vue component to be tested
 @Component({
   template: '<p>{{ message }}</p>',
 })
-export default class Hello extends Vue {
+class Hello {
   message = 'Hello World!';
 
   @Log
@@ -38,3 +37,5 @@ export default class Hello extends Vue {
     return (x + y);
   }
 }
+
+export default toVue(Hello);

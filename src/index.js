@@ -6,9 +6,9 @@
  *    All rights reserved.
  *
  ******************************************************************************/
-import Logger from './src/logger';
-import Log from './src/log';
-import HasLogger from './src/has-logger';
+import Logger from './logger';
+import Log from './log';
+import HasLogger from './has-logger';
 
 export {
   Logger,
