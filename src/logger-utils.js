@@ -37,8 +37,8 @@ const LOGGING_LEVELS = {
  * @private
  */
 function checkAppend(appender) {
-  if (typeof appender !== 'object') {
-    throw new TypeError('The appender for a logger must be an object.');
+  if (appender === null || typeof appender !== 'object') {
+    throw new TypeError('The appender for a logger must be a non-null object.');
   }
   for (const level in LOGGING_LEVELS) {
     if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
@@ -69,14 +69,9 @@ function checkLoggingLevel(level) {
   }
 }
 
-function composeFirstArgument(func1, func2) {
-  return (...args) => func1(func2(args[0]), ...args.slice(1));
-}
-
 export {
   NOOP,
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
-  composeFirstArgument,
 };

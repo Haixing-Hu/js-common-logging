@@ -9,13 +9,15 @@
 import { Logger } from '../src';
 import CustomizedAppender from './helper/customized-appender';
 
+afterEach(() => Logger.clearAllLoggers());
+
 /**
  * Unit test the `Logger` class, calling the default constructor will cause
  * error.
  *
  * @author Haixing Hu
  */
-describe('logger: constructor', () => {
+describe('Logger: constructor', () => {
   test('Cannot call the constructor directly', () => {
     expect(() => {
       new Logger('', console, 'ERROR');
@@ -33,7 +35,15 @@ describe('logger: constructor', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: Logger.getLogger()', () => {
+describe('Logger: getLogger() should work', () => {
+  test('`Logger.getLogger() with the empty string as logger name', () => {
+    const logger = Logger.getLogger('');
+    expect(logger.getName()).toBe('');
+  });
+  test('`Logger.getLogger() with provided name', () => {
+    const logger = Logger.getLogger('MyLogger');
+    expect(logger.getName()).toBe('MyLogger');
+  });
   test('`Logger.getLogger()` returns the same instance for the same name', () => {
     const logger1 = Logger.getLogger('MyLogger');
     const logger2 = Logger.getLogger('MyLogger');
@@ -42,37 +52,65 @@ describe('logger: Logger.getLogger()', () => {
     const logger4 = Logger.getLogger();
     expect(logger3).toBe(logger4);
   });
-  test('`Logger.getLogger()` must provide string as name', () => {
-    expect(() => {
-      Logger.getLogger(123);
-    }).toThrowWithMessage(
-      TypeError,
-      'The name of a logger must be a string, and empty string is allowed.',
-    );
-  });
-  test('`Logger.getLogger()` must provide correct appender', () => {
-    const correctAppender = {
+  test('`Logger.getLogger()` with default appender', () => {
+    const logger1 = Logger.getLogger('MyLogger1');
+    expect(logger1.getAppender()).toBe(Logger.getDefaultAppender());
+    const appender = {
       trace: () => {},
       debug: () => {},
       info: () => {},
       warn: () => {},
       error: () => {},
     };
-    const wrongAppender = {
+    Logger.setDefaultAppender(appender);
+    const logger2 = Logger.getLogger('MyLogger2');
+    expect(logger2.getAppender()).toBe(appender);
+  });
+  test('`Logger.getLogger()` with provided appender for new logger', () => {
+    const appender = {
       trace: () => {},
       debug: () => {},
       info: () => {},
       warn: () => {},
+      error: () => {},
     };
-    const logger = Logger.getLogger('MyLogger-TestAppender', correctAppender);
-    expect(logger.getAppender())
-      .toBe(correctAppender);
-    expect(() => {
-      Logger.getLogger('MyLogger', wrongAppender);
-    }).toThrowWithMessage(
-      Error,
-      'The appender of this logger has no error() method.',
-    );
+    const logger = Logger.getLogger('MyLogger', {appender: appender});
+    expect(logger.getAppender()).toBe(appender);
+  });
+  test('`Logger.getLogger()` with provided appender for existing logger', () => {
+    const logger1 = Logger.getLogger('MyLogger');
+    const appender = {
+      trace: () => {},
+      debug: () => {},
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+    };
+    const logger2 = Logger.getLogger('MyLogger', {appender: appender});
+    expect(logger1.getAppender()).toBe(appender);
+    expect(logger2.getAppender()).toBe(appender);
+  });
+  test('`Logger.getLogger()` with default logging level', () => {
+    const logger1 = Logger.getLogger('MyLogger1');
+    expect(logger1.getLevel()).toBe(Logger.getDefaultLevel());
+    Logger.setDefaultLevel('ERROR');
+    const logger2 = Logger.getLogger('MyLogger2');
+    expect(logger2.getLevel()).toBe('ERROR');
+  });
+  test('`Logger.getLogger()` with provided logging level for new logger', () => {
+    Logger.setDefaultLevel('DEBUG');
+    const logger1 = Logger.getLogger('MyLogger1');
+    expect(logger1.getLevel()).toBe('DEBUG');
+    const logger2 = Logger.getLogger('MyLogger2', { level: 'ERROR' });
+    expect(logger2.getLevel()).toBe('ERROR');
+  });
+  test('`Logger.getLogger()` with provided logging level for existing logger', () => {
+    Logger.setDefaultLevel('DEBUG');
+    const logger1 = Logger.getLogger('MyLogger');
+    expect(logger1.getLevel()).toBe('DEBUG');
+    const logger2 = Logger.getLogger('MyLogger', { level: 'ERROR' });
+    expect(logger1.getLevel()).toBe('ERROR');
+    expect(logger2.getLevel()).toBe('ERROR');
   });
 });
 
@@ -81,7 +119,7 @@ describe('logger: Logger.getLogger()', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: Use console', () => {
+describe('Logger: Use console appender', () => {
   const logger = Logger.getLogger();
   test('logger.trace', () => {
     const arg1 = 'hello';
@@ -135,9 +173,9 @@ describe('logger: Use console', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: Use customized appender', () => {
+describe('Logger: Use customized appender', () => {
   const appender = new CustomizedAppender();
-  const logger = Logger.getLogger('MyLogger', appender, 'TRACE');
+  const logger = Logger.getLogger('MyLogger', { appender, level: 'TRACE' });
   test('logger.trace', () => {
     const arg1 = 'hello';
     const arg2 = {
@@ -230,10 +268,10 @@ describe('logger: Use customized appender', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: set logging level', () => {
+describe('Logger: set logging level', () => {
   test('correct logging level in getLogger', () => {
     const appender = new CustomizedAppender();
-    const logger = Logger.getLogger('MyLogger1', appender, 'ERROR');
+    const logger = Logger.getLogger('MyLogger1', { appender, level: 'ERROR' });
     logger.trace('TRACE level should not be logged');
     logger.debug('DEBUG level should not be logged');
     logger.info('INFO level should not be logged');
@@ -248,7 +286,7 @@ describe('logger: set logging level', () => {
   });
   test('wrong logging level in getLogger', () => {
     expect(() => {
-      Logger.getLogger('MyLogger2', console, 'XXX');
+      Logger.getLogger('MyLogger2', { appender: console, level: 'XXX' });
     }).toThrowWithMessage(
       RangeError,
       'Unknown logging level "XXX". '
@@ -257,7 +295,7 @@ describe('logger: set logging level', () => {
   });
   test('correct logging level in setLevel()', () => {
     const appender = new CustomizedAppender();
-    const logger = Logger.getLogger('MyLogger3', appender, 'DEBUG');
+    const logger = Logger.getLogger('MyLogger3', { appender, level: 'DEBUG' });
     logger.debug('DEBUG level should be logged');
     expect(appender.logs.length).toBe(1);
     expect(appender.logs[0]).toEqual({
@@ -297,11 +335,11 @@ describe('logger: set logging level', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: set/get default logging level', () => {
+describe('Logger: set/get default logging level', () => {
   test('set correct default logging level', () => {
     Logger.setDefaultLevel('ERROR');
     const appender = new CustomizedAppender();
-    const logger = Logger.getLogger('MyLogger4', appender);
+    const logger = Logger.getLogger('MyLogger4', { appender });
     logger.trace('TRACE level should not be logged');
     logger.debug('DEBUG level should not be logged');
     logger.info('INFO level should not be logged');
@@ -334,7 +372,7 @@ describe('logger: set/get default logging level', () => {
  *
  * @author Haixing Hu
  */
-describe('logger: set/reset all logging level', () => {
+describe('Logger: set/reset all logging level', () => {
   test('correct logging level in Logger.setAllLevels()', () => {
     const l1 = Logger.getLogger('l1');
     const l2 = Logger.getLogger('l2');
@@ -366,5 +404,138 @@ describe('logger: set/reset all logging level', () => {
     expect(l2.getLevel()).toBe(defaultLevel);
     expect(l3.getLevel()).toBe(defaultLevel);
     expect(logger.getLevel()).toBe(defaultLevel);
+  });
+});
+
+
+/**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid logger name.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid logger name', () => {
+  test('`Logger.getLogger()` must provide string as name', () => {
+    expect(() => {
+      Logger.getLogger(0);
+    }).toThrowWithMessage(
+        TypeError,
+        'The name of a logger must be a string, and empty string is allowed.',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid appender.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid appender', () => {
+  const NOOP = () => {};
+  test('Appender is null', () => {
+    expect(() => Logger.getLogger('test', { appender: null }))
+      .toThrowWithMessage(
+        TypeError,
+        'The appender for a logger must be a non-null object.'
+      );
+  });
+  test('Appender is a string', () => {
+    expect(() => Logger.getLogger('test', { appender: 'hello' }))
+    .toThrowWithMessage(
+        TypeError,
+        'The appender for a logger must be a non-null object.'
+    );
+  });
+  test('Appender has no trace() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        debug: NOOP,
+        info: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no trace() method.'
+    );
+  });
+  test('Appender has no debug() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        info: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no debug() method.'
+    );
+  });
+  test('Appender has no info() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no info() method.'
+    );
+  });
+  test('Appender has no warn() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        info: NOOP,
+        error: NOOP,
+      },
+    }))
+    .toThrowWithMessage(
+        Error,
+        'The appender of this logger has no warn() method.'
+    );
+  });
+  test('Appender has no error() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        info: NOOP,
+        warn: NOOP,
+      },
+    }))
+    .toThrowWithMessage(
+        Error,
+        'The appender of this logger has no error() method.'
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid logging level.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid logging level', () => {
+  test('logging level is not string', () => {
+    expect(() => Logger.getLogger('test', { level: 0 }))
+      .toThrowWithMessage(TypeError, 'The logging level must be a string.');
+  });
+  test('logging level is not predefined', () => {
+    expect(() => Logger.getLogger('test', { level: 'xxx' }))
+    .toThrowWithMessage(
+      RangeError,
+      'Unknown logging level "xxx". '
+        + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
+    );
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@haixing_hu/common-logging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple JavaScript logging framework",
   "main": "dist/common-logging.cjs.min.js",
   "module": "dist/common-logging.es.min.js",

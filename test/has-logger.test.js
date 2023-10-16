@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 import { mount } from '@vue/test-utils';
-import { Logger } from '../src';
+import { Logger, HasLogger } from '../src';
 import CustomizedAppender from './helper/customized-appender';
 import MyClass from './helper/my-class';
 import HelloWithLogger from './helper/hello-with-logger-vue';
@@ -57,14 +57,7 @@ describe('Test @HasLogger decorator for normal class.', () => {
       ],
     });
   });
-});
 
-/**
- * Unit test of the `@HasLogger` decorator.
- *
- * @author Haiixng Hu
- */
-describe('Test @HasLogger decorator for Vue class component.', () => {
   test('Vue class component', async () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('HelloWithLogger');
@@ -154,17 +147,55 @@ describe('Test @HasLogger decorator for Vue class component.', () => {
       ],
     });
   });
-});
 
-/**
- * Unit test of the `@HasLogger` decorator.
- *
- * @author Haiixng Hu
- */
-describe('Test @HasLogger decorator for Vue class component, with wrong order of decorators.', () => {
-  test('Vue class component', async () => {
+  test('Vue class component with wrong order of decorators', async () => {
     expect(() => {
       mount(HelloWithLoggerWrongOrder);
     }).toThrow(TypeError);
+  });
+
+  test('HasLogger(null, context)', () => {
+    expect(() => HasLogger(null, {}))
+      .toThrowWithMessage(TypeError, 'The `@HasLogger` can only decorate a class.');
+  });
+
+  test('HasLogger(MyClass, { kind: "method" })', () => {
+    expect(() => HasLogger(MyClass, {kind: 'method'}))
+      .toThrowWithMessage(TypeError, 'The `@HasLogger` can only decorate a class.');
+  });
+
+  test('HasLogger(MyClass, null)', () => {
+    expect(() => HasLogger(MyClass, null))
+    .toThrowWithMessage(TypeError, 'The context must be an object.');
+  });
+
+  test('HasLogger(MyClass, "hello")', () => {
+    expect(() => HasLogger(MyClass, 'hello'))
+    .toThrowWithMessage(TypeError, 'The context must be an object.');
+  });
+
+  test('@HasLogger decorate a class twice', () => {
+    expect(() => {
+      @HasLogger
+      @HasLogger
+      class Test {}
+      new Test();
+    }).toThrowWithMessage(
+        Error,
+        'The @HasLogger decorator can only be used once on a class.',
+    );
+  });
+
+  test('@HasLogger decorated on class with `logger` field', () => {
+    expect(() => {
+      @HasLogger
+      class Test {
+        logger = 'logger';
+      }
+      new Test();
+    }).toThrowWithMessage(
+      Error,
+      'The @HasLogger cannot be decorated on the class with a `logger` field.',
+    );
   });
 });

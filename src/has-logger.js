@@ -66,6 +66,10 @@ function HasLogger(Class, context) {
   if (Class.prototype.logger) {
     throw new Error('The @HasLogger decorator can only be used once on a class.');
   }
+  const instance = new Class();
+  if (instance.logger !== undefined) {
+    throw new Error('The @HasLogger cannot be decorated on the class with a `logger` field.');
+  }
   // add the logger to the class prototype
   Class.prototype.logger = Logger.getLogger(context.name);
   return Class;

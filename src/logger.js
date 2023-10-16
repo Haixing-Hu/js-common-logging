@@ -88,23 +88,25 @@ class Logger {
    * `Logger` instance if it does not exist.
    *
    * @param {String} name
-   *    The name of the `Logger` instance to be retrieved.
-   * @param {Object} appender
-   *     Optional, indicating the content output pipe of the log. This object
-   *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
-   *     If this argument is `undefined`, the appender of the existing `Logger`
-   *     instance will not be changed, and the default appender will be used
-   *     to construct a new `Logger` instance if it does not exist.
-   * @param {String} level
-   *     Optional, indicating the logging level of this object. If this argument
-   *     is `undefined`, the logging level of the existing `Logger` instance
-   *     will not be changed, and the default logging level will be used to
-   *     construct a new `Logger` instance if it does not exist.
+   *     The name of the `Logger` instance to be retrieved.
+   * @param {Object} options
+   *     The optional options of the `Logger` instance to be retrieved. This
+   *     option object may have the following properties:
+   *     - `appender: Object`: the specified content output pipe of the log.
+   *       This object must provide `trace`, `debug`, `info`, `warn` and `error`
+   *       methods. If this option is not provided, the appender of the existing
+   *       `Logger` instance will not be changed, and the default appender
+   *       will be used to construct a new `Logger` instance if it does not exist.
+   *     - `level: String`: the logging level of the `Logger` instance to be
+   *       retrieved. If this option is not provided, the logging level of the
+   *       existing `Logger` instance will not be changed, and the default
+   *       logging level will be used to construct a new `Logger` instance if
+   *       it does not exist.
    * @return {Logger}
-   *     The `Logger` instance of the specified name, which either be the
-   *     existing one or a newly constructed one.
+   *       The `Logger` instance of the specified name, which either be the
+   *       existing one or a newly constructed one.
    */
-  static getLogger(name = '', appender = undefined, level = undefined) {
+  static getLogger(name = '', options = {}) {
     if (typeof name !== 'string') {
       throw new TypeError('The name of a logger must be a string, and empty string is allowed.');
     }
@@ -112,19 +114,26 @@ class Logger {
     if (logger === undefined) {
       // sets the internally constructing flag before constructing a instance
       __isInternalConstructing = true;
-      logger = new Logger(name, appender, level);
+      logger = new Logger(name, options.appender, options.level);
       // clear the internally constructing flag after constructing the new instance
       __isInternalConstructing = false;
       __loggerMap.set(name, logger);
     } else {
-      if (appender !== undefined) {
-        logger.setAppender(appender);
+      if (options.appender !== undefined) {
+        logger.setAppender(options.appender);
       }
-      if (level !== undefined) {
-        logger.setLevel(level);
+      if (options.level !== undefined) {
+        logger.setLevel(options.level);
       }
     }
     return logger;
+  }
+
+  /**
+   * Clears all existing `Logger` instances.
+   */
+  static clearAllLoggers() {
+    __loggerMap.clear();
   }
 
   /**

@@ -7,17 +7,18 @@
  *
  ******************************************************************************/
 import { mount } from '@vue/test-utils';
-import { Logger } from '../src';
+import {Logger, Log, HasLogger} from '../src';
 import CustomizedAppender from './helper/customized-appender';
 import Foo from './helper/foo';
 import Hello from './helper/hello-vue';
+import MyClass from './helper/my-class';
 
 /**
  * Unit test `@Log` decorator.
  *
  * @author Haixing Hu
  */
-describe('Test @Log decorator for class methods', () => {
+describe('Test @Log decorator', () => {
   test('Ordinary class method, no parameter', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');
@@ -35,6 +36,7 @@ describe('Test @Log decorator for class methods', () => {
       ],
     });
   });
+
   test('Ordinary class method, single parameter', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');
@@ -82,14 +84,7 @@ describe('Test @Log decorator for class methods', () => {
       ],
     });
   });
-});
 
-/**
- * Unit test `@Log` decorator.
- *
- * @author Haixing Hu
- */
-describe('Test @Log decorator for Vue methods', () => {
   test('@Log decorator for Vue class component methods', async () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Hello');
@@ -140,4 +135,25 @@ describe('Test @Log decorator for Vue methods', () => {
       ],
     });
   });
+
+  test('Log(null, context)', () => {
+    expect(() => Log(null, {}))
+    .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
+  });
+
+  test('Log(MyClass.prototype.foo, { kind: "method" })', () => {
+    expect(() => Log(MyClass.prototype.foo, {kind: 'class'}))
+    .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
+  });
+
+  test('Log(MyClass.prototype.foo, null)', () => {
+    expect(() => Log(MyClass.prototype.foo, null))
+    .toThrowWithMessage(TypeError, 'The context must be an object.');
+  });
+
+  test('Log(MyClass, "hello")', () => {
+    expect(() => Log(MyClass, 'hello'))
+    .toThrowWithMessage(TypeError, 'The context must be an object.');
+  });
+
 });
