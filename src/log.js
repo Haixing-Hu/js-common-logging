@@ -121,7 +121,7 @@ export function Log(target, context) {
   const metadata = context.metadata;
   metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY] ??= [];
   metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY].push(
-      (Class, instance, options) => vueLogDecorator(options, context.name),
+    (Class, instance, options) => vueLogDecorator(options, context.name),
   );
   // decorate the original method
   function decoratedMethod(...args) {

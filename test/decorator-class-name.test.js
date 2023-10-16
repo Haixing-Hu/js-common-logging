@@ -8,13 +8,13 @@
  ******************************************************************************/
 
 function Log(target, context) {
-  return function (...args) {
+  return function log(...args) {
     const prototype = Object.getPrototypeOf(this);
     const Class = prototype.constructor;
     const className = Class.name;
     console.debug(`${className}.${context.name}:`, ...args);
     return target.apply(this, args);
-  }
+  };
 }
 
 class Test {

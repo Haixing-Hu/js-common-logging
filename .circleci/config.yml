@@ -1,0 +1,36 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.1.0
+  coveralls: coveralls/coveralls@2.2.1
+
+jobs:
+  test_and_build:
+    executor:
+      name: node/default
+      tag: 20.8.0
+      resource_class: medium
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          with-cache: true
+      - run:
+          name: Lint Source Code
+          command: yarn lint
+      - run:
+          name: Test the library
+          command: yarn test
+      - run:
+          name: Build the library
+          command: yarn build
+      - coveralls/upload:
+          coverage_format: lcov
+          coverage_file: coverage/lcov.info
+
+workflows:
+  build_workflow:
+    jobs:
+      - test_and_build:
+          filters:
+            branches:
+              only: master
