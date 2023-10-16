@@ -160,18 +160,18 @@ describe('Test @HasLogger decorator for normal class.', () => {
   });
 
   test('HasLogger(MyClass, { kind: "method" })', () => {
-    expect(() => HasLogger(MyClass, {kind: 'method'}))
+    expect(() => HasLogger(MyClass, { kind: 'method' }))
       .toThrowWithMessage(TypeError, 'The `@HasLogger` can only decorate a class.');
   });
 
   test('HasLogger(MyClass, null)', () => {
     expect(() => HasLogger(MyClass, null))
-    .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context must be an object.');
   });
 
   test('HasLogger(MyClass, "hello")', () => {
     expect(() => HasLogger(MyClass, 'hello'))
-    .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context must be an object.');
   });
 
   test('@HasLogger decorate a class twice', () => {
@@ -181,8 +181,8 @@ describe('Test @HasLogger decorator for normal class.', () => {
       class Test {}
       new Test();
     }).toThrowWithMessage(
-        Error,
-        'The @HasLogger decorator can only be used once on a class.',
+      Error,
+      'The @HasLogger decorator can only be used once on a class.',
     );
   });
 

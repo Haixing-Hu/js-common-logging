@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 import { mount } from '@vue/test-utils';
-import {Logger, Log, HasLogger} from '../src';
+import { Logger, Log } from '../src';
 import CustomizedAppender from './helper/customized-appender';
 import Foo from './helper/foo';
 import Hello from './helper/hello-vue';
@@ -138,22 +138,21 @@ describe('Test @Log decorator', () => {
 
   test('Log(null, context)', () => {
     expect(() => Log(null, {}))
-    .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
+      .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
   });
 
   test('Log(MyClass.prototype.foo, { kind: "method" })', () => {
-    expect(() => Log(MyClass.prototype.foo, {kind: 'class'}))
-    .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
+    expect(() => Log(MyClass.prototype.foo, { kind: 'class' }))
+      .toThrowWithMessage(TypeError, 'The `@Log` can only decorate a class method.');
   });
 
   test('Log(MyClass.prototype.foo, null)', () => {
     expect(() => Log(MyClass.prototype.foo, null))
-    .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context must be an object.');
   });
 
   test('Log(MyClass, "hello")', () => {
     expect(() => Log(MyClass, 'hello'))
-    .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context must be an object.');
   });
-
 });
