@@ -115,6 +115,138 @@ describe('Logger: getLogger() should work', () => {
 });
 
 /**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid logger name.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid logger name', () => {
+  test('`Logger.getLogger()` must provide string as name', () => {
+    expect(() => {
+      Logger.getLogger(0);
+    }).toThrowWithMessage(
+        TypeError,
+        'The name of a logger must be a string, and empty string is allowed.',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid appender.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid appender', () => {
+  const NOOP = () => {};
+  test('Appender is null', () => {
+    expect(() => Logger.getLogger('test', { appender: null }))
+    .toThrowWithMessage(
+        TypeError,
+        'The appender for a logger must be a non-null object.',
+    );
+  });
+  test('Appender is a string', () => {
+    expect(() => Logger.getLogger('test', { appender: 'hello' }))
+    .toThrowWithMessage(
+        TypeError,
+        'The appender for a logger must be a non-null object.',
+    );
+  });
+  test('Appender has no trace() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        debug: NOOP,
+        info: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no trace() method.',
+    );
+  });
+  test('Appender has no debug() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        info: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no debug() method.',
+    );
+  });
+  test('Appender has no info() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        warn: NOOP,
+        error: NOOP,
+      },
+    })).toThrowWithMessage(
+        Error,
+        'The appender of this logger has no info() method.',
+    );
+  });
+  test('Appender has no warn() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        info: NOOP,
+        error: NOOP,
+      },
+    }))
+    .toThrowWithMessage(
+        Error,
+        'The appender of this logger has no warn() method.',
+    );
+  });
+  test('Appender has no error() function', () => {
+    expect(() => Logger.getLogger('test', {
+      appender: {
+        trace: NOOP,
+        debug: NOOP,
+        info: NOOP,
+        warn: NOOP,
+      },
+    }))
+    .toThrowWithMessage(
+        Error,
+        'The appender of this logger has no error() method.',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class.
+ *
+ * Test the `Logger.getLogger()` with invalid logging level.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: `getLogger()` with invalid logging level', () => {
+  test('logging level is not string', () => {
+    expect(() => Logger.getLogger('test', { level: 0 }))
+    .toThrowWithMessage(TypeError, 'The logging level must be a string.');
+  });
+  test('logging level is not predefined', () => {
+    expect(() => Logger.getLogger('test', { level: 'xxx' }))
+    .toThrowWithMessage(
+        RangeError,
+        'Unknown logging level "xxx". '
+        + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
+    );
+  });
+});
+
+/**
  * Unit test the `Logger` class, using the default console as output.
  *
  * @author Haixing Hu
@@ -408,133 +540,163 @@ describe('Logger: set/reset all logging level', () => {
 });
 
 /**
- * Unit test the `Logger` class.
- *
- * Test the `Logger.getLogger()` with invalid logger name.
+ * Unit test the `Logger` class, set/reset all appenders.
  *
  * @author Haixing Hu
  */
-describe('Logger: `getLogger()` with invalid logger name', () => {
-  test('`Logger.getLogger()` must provide string as name', () => {
-    expect(() => {
-      Logger.getLogger(0);
-    }).toThrowWithMessage(
-      TypeError,
-      'The name of a logger must be a string, and empty string is allowed.',
-    );
+describe('Logger: set/reset all appenders', () => {
+  test('Logger.setAllAppenders() and Logger.resetAllAppenders() should work', () => {
+    const logger1 = Logger.getLogger('l1');
+    const logger2 = Logger.getLogger('l2');
+    const logger3 = Logger.getLogger('l3');
+    const defaultAppender = Logger.getDefaultAppender();
+    expect(logger1.getAppender()).toBe(defaultAppender);
+    expect(logger2.getAppender()).toBe(defaultAppender);
+    expect(logger3.getAppender()).toBe(defaultAppender);
+    const appender = new CustomizedAppender();
+    Logger.setAllAppenders(appender);
+    expect(logger1.getAppender()).toBe(appender);
+    expect(logger2.getAppender()).toBe(appender);
+    expect(logger3.getAppender()).toBe(appender);
+    expect(Logger.getDefaultAppender()).toBe(defaultAppender);
+    const logger4 = Logger.getLogger('l4');
+    expect(logger4.getAppender()).toBe(defaultAppender);
+    Logger.resetAllAppenders();
+    expect(logger1.getAppender()).toBe(defaultAppender);
+    expect(logger2.getAppender()).toBe(defaultAppender);
+    expect(logger3.getAppender()).toBe(defaultAppender);
+    expect(logger4.getAppender()).toBe(defaultAppender);
   });
-});
-
-/**
- * Unit test the `Logger` class.
- *
- * Test the `Logger.getLogger()` with invalid appender.
- *
- * @author Haixing Hu
- */
-describe('Logger: `getLogger()` with invalid appender', () => {
-  const NOOP = () => {};
-  test('Appender is null', () => {
-    expect(() => Logger.getLogger('test', { appender: null }))
+  test('Logger.setAllAppenders() with invalid appender', () => {
+    const NOOP = () => {};
+    expect(() => Logger.setAllAppenders(null))
       .toThrowWithMessage(
         TypeError,
         'The appender for a logger must be a non-null object.',
       );
-  });
-  test('Appender is a string', () => {
-    expect(() => Logger.getLogger('test', { appender: 'hello' }))
+    expect(() => Logger.setAllAppenders('hello'))
       .toThrowWithMessage(
         TypeError,
         'The appender for a logger must be a non-null object.',
       );
-  });
-  test('Appender has no trace() function', () => {
-    expect(() => Logger.getLogger('test', {
-      appender: {
-        debug: NOOP,
-        info: NOOP,
-        warn: NOOP,
-        error: NOOP,
-      },
+    expect(() => Logger.setAllAppenders({
+      debug: NOOP,
+      info: NOOP,
+      warn: NOOP,
+      error: NOOP,
     })).toThrowWithMessage(
       Error,
       'The appender of this logger has no trace() method.',
     );
-  });
-  test('Appender has no debug() function', () => {
-    expect(() => Logger.getLogger('test', {
-      appender: {
-        trace: NOOP,
-        info: NOOP,
-        warn: NOOP,
-        error: NOOP,
-      },
+    expect(() => Logger.setAllAppenders({
+      trace: NOOP,
+      info: NOOP,
+      warn: NOOP,
+      error: NOOP,
     })).toThrowWithMessage(
       Error,
       'The appender of this logger has no debug() method.',
     );
-  });
-  test('Appender has no info() function', () => {
-    expect(() => Logger.getLogger('test', {
-      appender: {
-        trace: NOOP,
-        debug: NOOP,
-        warn: NOOP,
-        error: NOOP,
-      },
+    expect(() => Logger.setAllAppenders({
+      trace: NOOP,
+      debug: NOOP,
+      warn: NOOP,
+      error: NOOP,
     })).toThrowWithMessage(
       Error,
       'The appender of this logger has no info() method.',
     );
-  });
-  test('Appender has no warn() function', () => {
-    expect(() => Logger.getLogger('test', {
-      appender: {
-        trace: NOOP,
-        debug: NOOP,
-        info: NOOP,
-        error: NOOP,
-      },
-    }))
-      .toThrowWithMessage(
-        Error,
-        'The appender of this logger has no warn() method.',
-      );
-  });
-  test('Appender has no error() function', () => {
-    expect(() => Logger.getLogger('test', {
-      appender: {
-        trace: NOOP,
-        debug: NOOP,
-        info: NOOP,
-        warn: NOOP,
-      },
-    }))
-      .toThrowWithMessage(
-        Error,
-        'The appender of this logger has no error() method.',
-      );
+    expect(() => Logger.setAllAppenders({
+      trace: NOOP,
+      debug: NOOP,
+      info: NOOP,
+      error: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no warn() method.',
+    );
+    expect(() => Logger.setAllAppenders({
+      trace: NOOP,
+      debug: NOOP,
+      info: NOOP,
+      warn: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no error() method.',
+    );
   });
 });
 
 /**
- * Unit test the `Logger` class.
- *
- * Test the `Logger.getLogger()` with invalid logging level.
+ * Unit test the `Logger` class, enable/disable.
  *
  * @author Haixing Hu
  */
-describe('Logger: `getLogger()` with invalid logging level', () => {
-  test('logging level is not string', () => {
-    expect(() => Logger.getLogger('test', { level: 0 }))
-      .toThrowWithMessage(TypeError, 'The logging level must be a string.');
+describe('Logger: enable/disable', () => {
+  test('logger.enable(), logger.disable() should work', () => {
+    const appender = new CustomizedAppender();
+    const logger = Logger.getLogger('MyLogger', { appender, level: 'INFO' });
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(3);
+    expect(appender.logs[0].type).toBe('INFO');
+    expect(appender.logs[1].type).toBe('WARN');
+    expect(appender.logs[2].type).toBe('ERROR');
+    logger.disable();
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(3);
+    logger.enable();
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(6);
+    expect(appender.logs[0].type).toBe('INFO');
+    expect(appender.logs[1].type).toBe('WARN');
+    expect(appender.logs[2].type).toBe('ERROR');
+    expect(appender.logs[3].type).toBe('INFO');
+    expect(appender.logs[4].type).toBe('WARN');
+    expect(appender.logs[5].type).toBe('ERROR');
   });
-  test('logging level is not predefined', () => {
-    expect(() => Logger.getLogger('test', { level: 'xxx' }))
-      .toThrowWithMessage(
-        RangeError,
-        'Unknown logging level "xxx". '
-        + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
-      );
+  test('logger.setEnabled() should work', () => {
+    const appender = new CustomizedAppender();
+    const logger = Logger.getLogger('MyLogger', { appender, level: 'INFO' });
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(3);
+    expect(appender.logs[0].type).toBe('INFO');
+    expect(appender.logs[1].type).toBe('WARN');
+    expect(appender.logs[2].type).toBe('ERROR');
+    logger.setEnabled(false);
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(3);
+    logger.setEnabled(true);
+    logger.trace('TRACE level should not be logged');
+    logger.debug('DEBUG level should not be logged');
+    logger.info('INFO level should not be logged');
+    logger.warn('WARN level should not be logged');
+    logger.error('ERROR level should be logged');
+    expect(appender.logs.length).toBe(6);
+    expect(appender.logs[0].type).toBe('INFO');
+    expect(appender.logs[1].type).toBe('WARN');
+    expect(appender.logs[2].type).toBe('ERROR');
+    expect(appender.logs[3].type).toBe('INFO');
+    expect(appender.logs[4].type).toBe('WARN');
+    expect(appender.logs[5].type).toBe('ERROR');
   });
 });
