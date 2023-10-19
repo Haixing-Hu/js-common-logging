@@ -126,8 +126,8 @@ describe('Logger: `getLogger()` with invalid logger name', () => {
     expect(() => {
       Logger.getLogger(0);
     }).toThrowWithMessage(
-        TypeError,
-        'The name of a logger must be a string, and empty string is allowed.',
+      TypeError,
+      'The name of a logger must be a string, and empty string is allowed.',
     );
   });
 });
@@ -143,17 +143,17 @@ describe('Logger: `getLogger()` with invalid appender', () => {
   const NOOP = () => {};
   test('Appender is null', () => {
     expect(() => Logger.getLogger('test', { appender: null }))
-    .toThrowWithMessage(
+      .toThrowWithMessage(
         TypeError,
         'The appender for a logger must be a non-null object.',
-    );
+      );
   });
   test('Appender is a string', () => {
     expect(() => Logger.getLogger('test', { appender: 'hello' }))
-    .toThrowWithMessage(
+      .toThrowWithMessage(
         TypeError,
         'The appender for a logger must be a non-null object.',
-    );
+      );
   });
   test('Appender has no trace() function', () => {
     expect(() => Logger.getLogger('test', {
@@ -164,8 +164,8 @@ describe('Logger: `getLogger()` with invalid appender', () => {
         error: NOOP,
       },
     })).toThrowWithMessage(
-        Error,
-        'The appender of this logger has no trace() method.',
+      Error,
+      'The appender of this logger has no trace() method.',
     );
   });
   test('Appender has no debug() function', () => {
@@ -177,8 +177,8 @@ describe('Logger: `getLogger()` with invalid appender', () => {
         error: NOOP,
       },
     })).toThrowWithMessage(
-        Error,
-        'The appender of this logger has no debug() method.',
+      Error,
+      'The appender of this logger has no debug() method.',
     );
   });
   test('Appender has no info() function', () => {
@@ -190,8 +190,8 @@ describe('Logger: `getLogger()` with invalid appender', () => {
         error: NOOP,
       },
     })).toThrowWithMessage(
-        Error,
-        'The appender of this logger has no info() method.',
+      Error,
+      'The appender of this logger has no info() method.',
     );
   });
   test('Appender has no warn() function', () => {
@@ -203,10 +203,10 @@ describe('Logger: `getLogger()` with invalid appender', () => {
         error: NOOP,
       },
     }))
-    .toThrowWithMessage(
+      .toThrowWithMessage(
         Error,
         'The appender of this logger has no warn() method.',
-    );
+      );
   });
   test('Appender has no error() function', () => {
     expect(() => Logger.getLogger('test', {
@@ -217,10 +217,10 @@ describe('Logger: `getLogger()` with invalid appender', () => {
         warn: NOOP,
       },
     }))
-    .toThrowWithMessage(
+      .toThrowWithMessage(
         Error,
         'The appender of this logger has no error() method.',
-    );
+      );
   });
 });
 
@@ -234,15 +234,15 @@ describe('Logger: `getLogger()` with invalid appender', () => {
 describe('Logger: `getLogger()` with invalid logging level', () => {
   test('logging level is not string', () => {
     expect(() => Logger.getLogger('test', { level: 0 }))
-    .toThrowWithMessage(TypeError, 'The logging level must be a string.');
+      .toThrowWithMessage(TypeError, 'The logging level must be a string.');
   });
   test('logging level is not predefined', () => {
     expect(() => Logger.getLogger('test', { level: 'xxx' }))
-    .toThrowWithMessage(
+      .toThrowWithMessage(
         RangeError,
         'Unknown logging level "xxx". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
-    );
+      );
   });
 });
 
