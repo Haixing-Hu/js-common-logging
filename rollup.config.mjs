@@ -8,4 +8,4 @@
 ////////////////////////////////////////////////////////////////////////////////
 import rollupBuilder from '@haixing_hu/rollup-builder';
 
-export default rollupBuilder('CommonLogging', import.meta.url);
+export default rollupBuilder('Logging', import.meta.url);
