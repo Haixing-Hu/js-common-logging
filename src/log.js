@@ -65,14 +65,15 @@ function printMethodLog(className, methodName, args) {
  *     Options object used to create Vue components.
  * @param {String} key
  *     The name of the property or method to which this decorator applies.
+ * @param {Function} originalMethod
+ *     The original method to be called.
  * @author Haixing Hu
  * @private
  */
-function vueLogDecorator(options, key) {
+function vueLogDecorator(options, key, originalMethod) {
   // If the method decorated by the decorator is a Vue's life cycle hook function,
   // Then `col` is `options`; otherwise `col` is `options.methods`
   const col = (VUE_FUNCTIONS.includes(key) ? options : options.methods);
-  const originalMethod = col[key];
   col[key] = function logWrapperMethod(...args) {
     printMethodLog(options.name, key, args);
     return originalMethod.apply(this, args);
@@ -121,7 +122,7 @@ export function Log(target, context) {
   const metadata = context.metadata;
   metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY] ??= [];
   metadata[VUE3_CLASS_COMPONENT_DECORATORS_KEY].push(
-    (Class, instance, options) => vueLogDecorator(options, context.name),
+    (Class, instance, options) => vueLogDecorator(options, context.name, target),
   );
   // decorate the original method
   function decoratedMethod(...args) {

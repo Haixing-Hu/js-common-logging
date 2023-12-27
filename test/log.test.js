@@ -87,8 +87,7 @@ describe('Test @Log decorator', () => {
 
   test('@Log decorator for Vue class component methods', async () => {
     const appender = new CustomizedAppender();
-    const logger = Logger.getLogger('Hello');
-    logger.setAppender(appender);
+    Logger.setDefaultAppender(appender);
     const hello = mount(Hello);
     await hello.vm.$nextTick();
     // Check rendering results
