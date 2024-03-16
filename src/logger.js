@@ -141,9 +141,9 @@ class Logger {
    *
    * @return {String}
    *     The default logging level of all `Logger` instants.
-   * @see {@link Logger.setDefaultLevel}
-   * @see {@link Logger.setAllLevels}
-   * @see {@link Logger.resetAllLevels}
+   * @see Logger.setDefaultLevel
+   * @see Logger.setAllLevels
+   * @see Logger.resetAllLevels
    */
   static getDefaultLevel() {
     return __defaultLevel;
@@ -154,9 +154,9 @@ class Logger {
    *
    * @param {String} level
    *     The new default logging level of all `Logger` instants.
-   * @see {@link Logger.getDefaultLevel}
-   * @see {@link Logger.setAllLevels}
-   * @see {@link Logger.resetAllLevels}
+   * @see Logger.getDefaultLevel
+   * @see Logger.setAllLevels
+   * @see Logger.resetAllLevels
    */
   static setDefaultLevel(level) {
     checkLoggingLevel(level);
@@ -169,9 +169,9 @@ class Logger {
    * @param {String} level
    *    The new logging level of all `Logger` instants. The possible levels are
    *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
-   * @see {@link Logger.getDefaultLevel}
-   * @see {@link Logger.setDefaultLevel}
-   * @see {@link Logger.resetAllLevels}
+   * @see Logger.getDefaultLevel
+   * @see Logger.setDefaultLevel
+   * @see Logger.resetAllLevels
    */
   static setAllLevels(level) {
     level = level.toUpperCase();
@@ -184,9 +184,9 @@ class Logger {
   /**
    * Sets the logging level of all `Logger` instants to the default logging level.
    *
-   * @see {@link Logger.getDefaultLevel}
-   * @see {@link Logger.setDefaultLevel}
-   * @see {@link Logger.setAllLevels}
+   * @see Logger.getDefaultLevel
+   * @see Logger.setDefaultLevel
+   * @see Logger.setAllLevels
    */
   static resetAllLevels() {
     Logger.setAllLevels(__defaultLevel);
@@ -197,9 +197,9 @@ class Logger {
    *
    * @return {Object}
    *     The default log appender of all `Logger` instants.
-   * @see {@link Logger.setDefaultAppender}
-   * @see {@link Logger.setAllAppenders}
-   * @see {@link Logger.resetAllAppenders}
+   * @see Logger.setDefaultAppender
+   * @see Logger.setAllAppenders
+   * @see Logger.resetAllAppenders
    */
   static getDefaultAppender() {
     return __defaultAppender;
@@ -210,9 +210,9 @@ class Logger {
    *
    * @param {Object} appender
    *     The new default log appender of all `Logger` instants.
-   * @see {@link Logger.getDefaultAppender}
-   * @see {@link Logger.setAllAppenders}
-   * @see {@link Logger.resetAllAppenders}
+   * @see Logger.getDefaultAppender
+   * @see Logger.setAllAppenders
+   * @see Logger.resetAllAppenders
    */
   static setDefaultAppender(appender) {
     checkAppend(appender);
@@ -226,9 +226,9 @@ class Logger {
    *     The new appender to be set, indicating the content output pipe of the
    *     log. This object must provide `trace`, `debug`, `info`, `warn` and
    *     `error` methods.
-   * @see {@link Logger.getDefaultAppender}
-   * @see {@link Logger.setDefaultAppender}
-   * @see {@link Logger.resetAllAppenders}
+   * @see Logger.getDefaultAppender
+   * @see Logger.setDefaultAppender
+   * @see Logger.resetAllAppenders
    */
   static setAllAppenders(appender) {
     checkAppend(appender);
@@ -240,9 +240,9 @@ class Logger {
   /**
    * Sets the appender of all `Logger` instants to the default appender.
    *
-   * @see {@link Logger.getDefaultAppender}
-   * @see {@link Logger.setDefaultAppender}
-   * @see {@link Logger.setAllAppenders}
+   * @see Logger.getDefaultAppender
+   * @see Logger.setDefaultAppender
+   * @see Logger.setAllAppenders
    */
   static resetAllAppenders() {
     Logger.setAllAppenders(__defaultAppender);
@@ -264,7 +264,7 @@ class Logger {
    * @param {String} level
    *     Optional, indicating the log level of this object. The default value
    *     of this argument is `Logger.getDefaultLevel()`.
-   * @see {@link Logger.getLogger}
+   * @see Logger.getLogger
    */
   constructor(name, appender, level) {
     if (!__isInternalConstructing) {
