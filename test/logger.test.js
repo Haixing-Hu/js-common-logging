@@ -9,7 +9,12 @@
 import { Logger } from '../src';
 import CustomizedAppender from './helper/customized-appender';
 
-afterEach(() => Logger.clearAllLoggers());
+// 在每个测试之前清理现有的Logger实例
+beforeEach(() => {
+  console.log('Clean up before each');
+  Logger.clearAllLoggers();
+  Logger.resetDefaultLevel();
+});
 
 /**
  * Unit test the `Logger` class, calling the default constructor will cause
@@ -485,6 +490,7 @@ describe('Logger: set/get default logging level', () => {
     ]);
   });
   test('get default logging level', () => {
+    Logger.setDefaultLevel('ERROR');
     const level = Logger.getDefaultLevel();
     expect(level).toBe('ERROR');
   });
@@ -698,5 +704,54 @@ describe('Logger: enable/disable', () => {
     expect(appender.logs[3].type).toBe('INFO');
     expect(appender.logs[4].type).toBe('WARN');
     expect(appender.logs[5].type).toBe('ERROR');
+  });
+});
+
+/**
+ * Unit test the `Logger` class, getLoggerLevel/setLoggerLevel.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: getLoggerLevel/setLoggerLevel', () => {
+  test('getLoggerLevel returns default level for non-existing logger', () => {
+    const name = 'nonExistingLogger';
+    expect(Logger.getLoggerLevel(name)).toBe(Logger.getDefaultLevel());
+    Logger.setDefaultLevel('ERROR');
+    expect(Logger.getLoggerLevel(name)).toBe('ERROR');
+  });
+
+  test('set and get logger level', () => {
+    const name = 'testLogger';
+    const levels = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'NONE'];
+    levels.forEach((level) => {
+      Logger.setLoggerLevel(name, level);
+      expect(Logger.getLoggerLevel(name)).toBe(level);
+    });
+  });
+
+  test('setting invalid logger level should throw error', () => {
+    const name = 'testLogger';
+    const invalidLevel = 'INVALID_LEVEL';
+    expect(() => Logger.setLoggerLevel(name, invalidLevel)).toThrow();
+  });
+
+  test('setLoggerLevel affects existing logger instance', () => {
+    const name = 'testLogger';
+    const logger = Logger.getLogger(name);
+    const newLevel = 'ERROR';
+    Logger.setLoggerLevel(name, newLevel);
+    expect(logger.getLevel()).toBe(newLevel);
+  });
+
+  test('setLoggerLevel does not affect other loggers', () => {
+    const name1 = 'logger1';
+    const name2 = 'logger2';
+    const logger1 = Logger.getLogger(name1);
+    const logger2 = Logger.getLogger(name2);
+    const newLevel = (Logger.getDefaultLevel() === 'ERROR' ? 'INFO' : 'ERROR');
+
+    Logger.setLoggerLevel(name1, newLevel);
+    expect(logger1.getLevel()).toBe(newLevel);
+    expect(logger2.getLevel()).not.toBe(newLevel);
   });
 });

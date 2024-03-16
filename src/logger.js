@@ -14,12 +14,19 @@ import {
 } from './logger-utils';
 
 /**
+ * The default value of the Logger class's default logging level.
+ *
+ * @type {string}
+ */
+const DEFAULT_DEFAULT_LEVEL = 'DEBUG';
+
+/**
  * The default logging level of all `Logger` instances, which is `DEBUG`.
  *
  * @private
  * @author Haixing Hu
  */
-let __defaultLevel = 'DEBUG';
+let __defaultLevel = DEFAULT_DEFAULT_LEVEL;
 
 /**
  * The default log appender of all `Logger` instances, which is `console`.
@@ -39,6 +46,17 @@ let __defaultAppender = console;
  * @author Haixing Hu
  */
 const __loggerMap = new Map();
+
+/**
+ * The map of all logging levels.
+ *
+ * This value maps the name of a `Logger` instance to its logging level.
+ *
+ * @type {Map<String, String>}
+ * @private
+ * @author Haixing Hu
+ */
+const __levelMap = new Map();
 
 /**
  * Indicates whether the `Logger` instance is under internal constructing.
@@ -134,6 +152,39 @@ class Logger {
    */
   static clearAllLoggers() {
     __loggerMap.clear();
+    __levelMap.clear();
+  }
+
+  /**
+   * Gets the logging level of the `Logger` instance of the specified name.
+   *
+   * @param name
+   *     The name of the `Logger` instance.
+   * @returns {String|string}
+   *     The logging level of the `Logger` instance of the specified name. If the
+   *     `Logger` instance of the specified name does not exist, the default
+   *     logging level will be returned.
+   */
+  static getLoggerLevel(name) {
+    const level = __levelMap.get(name);
+    return level ?? __defaultLevel;
+  }
+
+  /**
+   * Sets the logging level of the `Logger` instance of the specified name.
+   *
+   * @param name
+   *     The name of the `Logger` instance.
+   * @param level
+   *     The new logging level of the `Logger` instance of the specified name.
+   */
+  static setLoggerLevel(name, level) {
+    checkLoggingLevel(level);
+    __levelMap.set(name, level);
+    const logger = __loggerMap.get(name);
+    if (logger !== undefined) {
+      logger.setLevel(level);
+    }
   }
 
   /**
@@ -161,6 +212,14 @@ class Logger {
   static setDefaultLevel(level) {
     checkLoggingLevel(level);
     __defaultLevel = level;
+  }
+
+  /**
+   * Resets the default logging level of all `Logger` instants to the default
+   * value.
+   */
+  static resetDefaultLevel() {
+    __defaultLevel = DEFAULT_DEFAULT_LEVEL;
   }
 
   /**
@@ -277,7 +336,7 @@ class Logger {
       checkAppend(appender);
     }
     if (level === undefined) {
-      level = __defaultLevel;
+      level = __levelMap.get(name) ?? __defaultLevel;
     } else {
       checkLoggingLevel(level);
     }
@@ -285,6 +344,7 @@ class Logger {
     this._level = level;
     this._appender = appender;
     this._bindLoggingMethods(level, appender);
+    __levelMap.set(name, level);
   }
 
   /**

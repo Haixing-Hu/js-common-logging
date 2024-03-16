@@ -1,6 +1,6 @@
 {
   "name": "@haixing_hu/logging",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A simple JavaScript logging framework",
   "author": "Haixing Hu",
   "license": "Apache-2.0",
