@@ -112,7 +112,7 @@ function vueLogDecorator(options, key, originalMethod) {
  */
 export function Log(target, context) {
   if (context === null || typeof context !== 'object') {
-    throw new TypeError('The context must be an object.');
+    throw new TypeError('The context of `@Log` decorator must be an object.');
   }
   if (typeof target !== 'function' || context.kind !== 'method') {
     throw new TypeError('The `@Log` can only decorate a class method.');
