@@ -147,11 +147,11 @@ describe('Test @Log decorator', () => {
 
   test('Log(MyClass.prototype.foo, null)', () => {
     expect(() => Log(MyClass.prototype.foo, null))
-      .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context of `@Log` decorator must be an object.');
   });
 
   test('Log(MyClass, "hello")', () => {
     expect(() => Log(MyClass, 'hello'))
-      .toThrowWithMessage(TypeError, 'The context must be an object.');
+      .toThrowWithMessage(TypeError, 'The context of `@Log` decorator must be an object.');
   });
 });
