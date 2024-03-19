@@ -453,7 +453,8 @@ class Logger {
   _bindLoggingMethods(level, appender) {
     const target = LOGGING_LEVELS[level];
     for (const level in LOGGING_LEVELS) {
-      if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
+      // NOTE: do NOT use Object.hasOwn() because it has a lot of compatibility problems
+      if (Object.prototype.hasOwnProperty.call(LOGGING_LEVELS, level) && (level !== 'NONE')) {
         const m = level.toLowerCase();
         if (LOGGING_LEVELS[level] < target) {
           // binds the private logging method of this object to no-op

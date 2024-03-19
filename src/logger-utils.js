@@ -41,7 +41,8 @@ function checkAppend(appender) {
     throw new TypeError('The appender for a logger must be a non-null object.');
   }
   for (const level in LOGGING_LEVELS) {
-    if (Object.hasOwn(LOGGING_LEVELS, level) && (level !== 'NONE')) {
+    // NOTE: do NOT use Object.hasOwn() because it has a lot of compatibility problems
+    if (Object.prototype.hasOwnProperty.call(LOGGING_LEVELS, level) && (level !== 'NONE')) {
       const methodName = level.toLowerCase();
       const method = appender[methodName];
       if (typeof method !== 'function') {
