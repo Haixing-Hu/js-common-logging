@@ -90,6 +90,8 @@ function vueLogDecorator(options, key, originalMethod) {
  *
  * Usage example:
  * ```js
+ * import { Log } from '@haixing_hu/logging';
+ *
  * class Person {
  *   &#064;Log
  *   eat(meal) {

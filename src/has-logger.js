@@ -16,7 +16,7 @@ import Logger from './logger';
  *
  * Example usage:
  * ```js
- * import HasLogger from '@haixing_hu/js-common-logging/src/has-logger';
+ * import { HasLogger } from '@haixing_hu/logging';
  *
  * &#064;HasLogger
  * class MyClass {
@@ -28,21 +28,21 @@ import Logger from './logger';
  *
  * The following is another example usage with the class component of Vue.js:
  * ```js
- * import Vue from 'vue';
- * import Component from 'vue-class-component';
- * import HasLogger from '@haixing_hu/js-common-logging/src/has-logger';
- * import Log from '@haixing_hu/js-common-logging/src/log';
+ * import { Component, toVue } from '@haixing_hu/vue3-class-component';
+ * import { HasLogger, Log } from '@haixing_hu/logging';
  *
  * &#064;Component({
- *   template: '<p>{{ message }}</p>',
+ *   template: '<p &#064;click="foo">{{ message }}</p>',
  * })
  * &#064;HasLogger
- * class MyComponent extends Vue {
+ * class MyComponent {
  *    &#064;Log
  *    foo() {
  *      this.logger.debug('This is MyComponent.foo()');
  *    }
  * }
+ *
+ * export default toVue(MyComponent);
  * ```
  *
  * **NOTE**: the order of the decorators is IMPORTANT. The `@HasLogger` decorator
