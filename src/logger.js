@@ -11,6 +11,7 @@ import {
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
+  upperCaseString,
 } from './logger-utils';
 
 /**
@@ -117,10 +118,11 @@ class Logger {
    *       `Logger` instance will not be changed, and the default appender
    *       will be used to construct a new `Logger` instance if it does not exist.
    *     - `level: String`: the logging level of the `Logger` instance to be
-   *       retrieved. If this option is not provided, the logging level of the
-   *       existing `Logger` instance will not be changed, and the default
-   *       logging level will be used to construct a new `Logger` instance if
-   *       it does not exist.
+   *       retrieved. The allowed levels are `TRACE`, `DEBUG`, `INFO`, `WARN`,
+   *       `ERROR`, and `NONE`. Lowercase letters are also allowed. If this
+   *       option is not provided, the logging level of the existing `Logger`
+   *       instance will not be changed, and the default logging level will be
+   *       used to construct a new `Logger` instance if it does not exist.
    * @return {Logger}
    *       The `Logger` instance of the specified name, which either be the
    *       existing one or a newly constructed one.
@@ -178,8 +180,11 @@ class Logger {
    *     The name of the `Logger` instance.
    * @param level
    *     The new logging level of the `Logger` instance of the specified name.
+   *     The allowed levels are `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`,
+   *     and `NONE`. Lowercase letters are also allowed.
    */
   static setLoggerLevel(name, level) {
+    level = upperCaseString(level);
     checkLoggingLevel(level);
     __levelMap.set(name, level);
     const logger = __loggerMap.get(name);
@@ -205,12 +210,15 @@ class Logger {
    * Sets the default logging level of all `Logger` instants.
    *
    * @param {string} level
-   *     The new default logging level of all `Logger` instants.
+   *     The new default logging level of all `Logger` instants. The allowed
+   *     levels are `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
+   *     Lowercase letters are also allowed.
    * @see Logger.getDefaultLevel
    * @see Logger.setAllLevels
    * @see Logger.resetAllLevels
    */
   static setDefaultLevel(level) {
+    level = upperCaseString(level);
     checkLoggingLevel(level);
     __defaultLevel = level;
   }
@@ -227,14 +235,15 @@ class Logger {
    * Sets the logging level of all `Logger` instants.
    *
    * @param {string} level
-   *    The new logging level of all `Logger` instants. The possible levels are
-   *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
+   *    The new logging level of all `Logger` instants. The allowed levels are
+   *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`. Lowercase letters
+   *    are also allowed.
    * @see Logger.getDefaultLevel
    * @see Logger.setDefaultLevel
    * @see Logger.resetAllLevels
    */
   static setAllLevels(level) {
-    level = level.toUpperCase();
+    level = upperCaseString(level);
     checkLoggingLevel(level);
     for (const logger of __loggerMap.values()) {
       logger.setLevel(level);
@@ -339,6 +348,7 @@ class Logger {
     if (level === undefined) {
       level = __levelMap.get(name) ?? __defaultLevel;
     } else {
+      level = upperCaseString(level);
       checkLoggingLevel(level);
     }
     this._name = name;
@@ -397,11 +407,11 @@ class Logger {
    * Set the logging level of this logger.
    *
    * @param {string} level
-   *     The new logging level. The optional levels are `TRACE`, `DEBUG`, `INFO`,
-   *     `WARN`, `ERROR`, and `NONE`.
+   *     The new logging level. The allowed levels are `TRACE`, `DEBUG`, `INFO`,
+   *     `WARN`, `ERROR`, and `NONE`. Lowercase letters are also allowed.
    */
   setLevel(level) {
-    level = level.toUpperCase();
+    level = upperCaseString(level);
     checkLoggingLevel(level);
     this._bindLoggingMethods(level, this._appender);
     this._level = level;
@@ -524,7 +534,7 @@ class Logger {
    *     the array of arguments used to format the message.
    */
   log(level, message, ...args) {
-    const levelName = level.toUpperCase();
+    const levelName = upperCaseString(level);
     if ((LOGGING_LEVELS[levelName] !== undefined)
         && (LOGGING_LEVELS[levelName] >= LOGGING_LEVELS[this._level])) {
       const method = levelName.toLowerCase();

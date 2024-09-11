@@ -70,9 +70,26 @@ function checkLoggingLevel(level) {
   }
 }
 
+/**
+ * Convert a string to uppercase.
+ *
+ * @param {any} value
+ *     The value to be converted. If it is not a string, it will be returned directly.
+ * @return {*|string}
+ *     The converted string, or the original value if it is not a string.
+ * @private
+ */
+function upperCaseString(value) {
+  if ((typeof value !== 'string') && (!(value instanceof String))) {
+    return value;
+  }
+  return value.toUpperCase();
+}
+
 export {
   NOOP,
   LOGGING_LEVELS,
   checkAppend,
   checkLoggingLevel,
+  upperCaseString,
 };

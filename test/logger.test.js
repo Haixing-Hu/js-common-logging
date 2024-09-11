@@ -109,11 +109,26 @@ describe('Logger: getLogger() should work', () => {
     const logger2 = Logger.getLogger('MyLogger2', { level: 'ERROR' });
     expect(logger2.getLevel()).toBe('ERROR');
   });
+  test('`Logger.getLogger()` with provided lowercase logging level for new logger', () => {
+    Logger.setDefaultLevel('DEBUG');
+    const logger1 = Logger.getLogger('MyLogger1');
+    expect(logger1.getLevel()).toBe('DEBUG');
+    const logger2 = Logger.getLogger('MyLogger2', { level: 'error' });
+    expect(logger2.getLevel()).toBe('ERROR');
+  });
   test('`Logger.getLogger()` with provided logging level for existing logger', () => {
     Logger.setDefaultLevel('DEBUG');
     const logger1 = Logger.getLogger('MyLogger');
     expect(logger1.getLevel()).toBe('DEBUG');
     const logger2 = Logger.getLogger('MyLogger', { level: 'ERROR' });
+    expect(logger1.getLevel()).toBe('ERROR');
+    expect(logger2.getLevel()).toBe('ERROR');
+  });
+  test('`Logger.getLogger()` with provided lowercase logging level for existing logger', () => {
+    Logger.setDefaultLevel('DEBUG');
+    const logger1 = Logger.getLogger('MyLogger');
+    expect(logger1.getLevel()).toBe('DEBUG');
+    const logger2 = Logger.getLogger('MyLogger', { level: 'error' });
     expect(logger1.getLevel()).toBe('ERROR');
     expect(logger2.getLevel()).toBe('ERROR');
   });
@@ -245,7 +260,7 @@ describe('Logger: `getLogger()` with invalid logging level', () => {
     expect(() => Logger.getLogger('test', { level: 'xxx' }))
       .toThrowWithMessage(
         RangeError,
-        'Unknown logging level "xxx". '
+        'Unknown logging level "XXX". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
       );
   });
