@@ -303,6 +303,25 @@ describe('Logger: Use console appender', () => {
     logger.error('This is a ERROR message: %s, '
         + 'and another is %o, that is all.', arg1, arg2);
   });
+  test('logger.log', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: { id: 123, data: 'abc' },
+    };
+    logger.log('trace', 'This is a TRACE message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+    logger.log('debug', 'This is a DEBUG message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+    logger.log('info', 'This is a INFO message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+    logger.log('warn', 'This is a WARN message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+    logger.log('error', 'This is a ERROR message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+    logger.log('xxxx', 'This is a XXXX message: %s, '
+      + 'and another is %o, that is all.', arg1, arg2);
+  });
 });
 
 /**
@@ -397,6 +416,101 @@ describe('Logger: Use customized appender', () => {
       arg1,
       arg2,
     ]);
+  });
+  test('logger.log with trace level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('trace', 'This is a TRACE message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(6);
+    expect(appender.logs[5].type).toBe('TRACE');
+    expect(appender.logs[5].args).toEqual([
+      '[TRACE] MyLogger - %s',
+      'This is a TRACE message: %s, and another is %d, that is all.',
+      arg1,
+      arg2,
+    ]);
+  });
+  test('logger.log with debug level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('debug', 'This is a DEBUG message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(7);
+    expect(appender.logs[6].type).toBe('DEBUG');
+    expect(appender.logs[6].args).toEqual([
+      '[DEBUG] MyLogger - %s',
+      'This is a DEBUG message: %s, and another is %d, that is all.',
+      arg1,
+      arg2,
+    ]);
+  });
+  test('logger.log with info level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('info', 'This is a INFO message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(8);
+    expect(appender.logs[7].type).toBe('INFO');
+    expect(appender.logs[7].args).toEqual([
+      '[INFO] MyLogger - %s',
+      'This is a INFO message: %s, and another is %d, that is all.',
+      arg1,
+      arg2,
+    ]);
+  });
+  test('logger.log with warn level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('warn', 'This is a WARN message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(9);
+    expect(appender.logs[8].type).toBe('WARN');
+    expect(appender.logs[8].args).toEqual([
+      '[WARN] MyLogger - %s',
+      'This is a WARN message: %s, and another is %d, that is all.',
+      arg1,
+      arg2,
+    ]);
+  });
+  test('logger.log with error level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('error', 'This is a ERROR message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(10);
+    expect(appender.logs[9].type).toBe('ERROR');
+    expect(appender.logs[9].args).toEqual([
+      '[ERROR] MyLogger - %s',
+      'This is a ERROR message: %s, and another is %d, that is all.',
+      arg1,
+      arg2,
+    ]);
+  });
+  test('logger.log with xxx level', () => {
+    const arg1 = 'hello';
+    const arg2 = {
+      name: 'world',
+      value: 123,
+    };
+    logger.log('xxx', 'This is a ERROR message: %s, '
+      + 'and another is %d, that is all.', arg1, arg2);
+    expect(appender.logs.length).toBe(10);
   });
 });
 

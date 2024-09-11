@@ -84,6 +84,7 @@ let __isInternalConstructing = false;
  * - `Logger.info(message, arg1, arg2, ...)`: Outputs a log message with the `INFO` level.
  * - `Logger.warn(message, arg1, arg2, ...)`: Outputs a log message with the `WARN` level.
  * - `Logger.error(message, arg1, arg2, ...)`: Outputs a log message with the `ERROR` level.
+ * - `Logger.log(level, message, arg1, arg2, ...)`: Outputs a log message with the specified level.
  *
  * The message argument of those logging methods supports the following
  * substitution patterns:
@@ -105,7 +106,7 @@ class Logger {
    * Gets the `Logger` instance of the specified name, or constructs a new
    * `Logger` instance if it does not exist.
    *
-   * @param {String} name
+   * @param {string} name
    *     The name of the `Logger` instance to be retrieved.
    * @param {Object} options
    *     The optional options of the `Logger` instance to be retrieved. This
@@ -190,7 +191,7 @@ class Logger {
   /**
    * Gets the default logging level of all `Logger` instants.
    *
-   * @return {String}
+   * @return {string}
    *     The default logging level of all `Logger` instants.
    * @see Logger.setDefaultLevel
    * @see Logger.setAllLevels
@@ -203,7 +204,7 @@ class Logger {
   /**
    * Sets the default logging level of all `Logger` instants.
    *
-   * @param {String} level
+   * @param {string} level
    *     The new default logging level of all `Logger` instants.
    * @see Logger.getDefaultLevel
    * @see Logger.setAllLevels
@@ -225,7 +226,7 @@ class Logger {
   /**
    * Sets the logging level of all `Logger` instants.
    *
-   * @param {String} level
+   * @param {string} level
    *    The new logging level of all `Logger` instants. The possible levels are
    *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
    * @see Logger.getDefaultLevel
@@ -313,14 +314,14 @@ class Logger {
    * **NOTE**: Do NOT call this constructor directly. Use the static method
    * `Logger.getLogger()` instead.
    *
-   * @param {String} name
+   * @param {string} name
    *     The optional name of this logger. The default value of this argument
    *     is an empty string.
    * @param {Object} appender
    *     Optional, indicating the content output pipe of the log. This object
    *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
    *     The default value of this argument is `Logger.getDefaultAppender()`.
-   * @param {String} level
+   * @param {string} level
    *     Optional, indicating the log level of this object. The default value
    *     of this argument is `Logger.getDefaultLevel()`.
    * @see Logger.getLogger
@@ -350,7 +351,7 @@ class Logger {
   /**
    * Get the name of this logger.
    *
-   * @returns {String}
+   * @returns {string}
    *     The name of this logger.
    */
   getName() {
@@ -384,7 +385,7 @@ class Logger {
   /**
    * Get the logging level of this logger.
    *
-   * @return {String}
+   * @return {string}
    *     The logging level of this logger. Possible return values are `TRACE`,
    *     `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
    */
@@ -395,7 +396,7 @@ class Logger {
   /**
    * Set the logging level of this logger.
    *
-   * @param {String} level
+   * @param {string} level
    *     The new logging level. The optional levels are `TRACE`, `DEBUG`, `INFO`,
    *     `WARN`, `ERROR`, and `NONE`.
    */
@@ -438,7 +439,7 @@ class Logger {
    * Rebinds all logging implementation methods to the corresponding logging
    * methods of the appender.
    *
-   * @param {String} level
+   * @param {string} level
    *     The target logging level. All logging methods belows this target logging
    *     level will be bind to a no-op function, while all logging methods above
    *     or equal to this target logging level will be bind to the corresponding
@@ -512,12 +513,32 @@ class Logger {
   // }
 
   /**
-   * Logs a message in the `TRACE` level.
+   * Logs a message in the specified logging level.
    *
-   * @param {String} message
+   * @param {string} level
+   *     the logging level.
+   * @param {string} message
    *     the message or message template, which may contain zero or more
    *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
-   * @param {Array} args
+   * @param {array} args
+   *     the array of arguments used to format the message.
+   */
+  log(level, message, ...args) {
+    const levelName = level.toUpperCase();
+    if ((LOGGING_LEVELS[levelName] !== undefined)
+        && (LOGGING_LEVELS[levelName] >= LOGGING_LEVELS[this._level])) {
+      const method = levelName.toLowerCase();
+      this[method](message, ...args);
+    }
+  }
+
+  /**
+   * Logs a message in the `TRACE` level.
+   *
+   * @param {string} message
+   *     the message or message template, which may contain zero or more
+   *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
+   * @param {array} args
    *     the array of arguments used to format the message.
    * @private
    */
@@ -527,10 +548,10 @@ class Logger {
   /**
    * Logs a message in the `DEBUG` level.
    *
-   * @param {String} message
+   * @param {string} message
    *     the message or message template, which may contain zero or more
    *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
-   * @param {Array} args
+   * @param {array} args
    *     the array of arguments used to format the message.
    * @private
    */
@@ -540,10 +561,10 @@ class Logger {
   /**
    * Logs a message in the `INFO` level.
    *
-   * @param {String} message
+   * @param {string} message
    *     the message or message template, which may contain zero or more
    *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
-   * @param {Array} args
+   * @param {array} args
    *     the array of arguments used to format the message.
    * @private
    */
@@ -553,10 +574,10 @@ class Logger {
   /**
    * Logs a message in the `WARN` level.
    *
-   * @param {String} message
+   * @param {string} message
    *     the message or message template, which may contain zero or more
    *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
-   * @param {Array} args
+   * @param {array} args
    *     the array of arguments used to format the message.
    * @private
    */
@@ -566,10 +587,10 @@ class Logger {
   /**
    * Logs a message in the `ERROR` level.
    *
-   * @param {String} message
+   * @param {string} message
    *     the message or message template, which may contain zero or more
    *     substitution patterns, e.g., '%o', '%s', '%d', '%f', ..., etc.
-   * @param {Array} args
+   * @param {array} args
    *     the array of arguments used to format the message.
    * @private
    */
