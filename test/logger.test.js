@@ -14,6 +14,7 @@ beforeEach(() => {
   console.log('Clean up before each');
   Logger.clearAllLoggers();
   Logger.resetDefaultLevel();
+  Logger.resetDefaultAppender();
 });
 
 /**
@@ -597,11 +598,11 @@ describe('Logger: set logging level', () => {
 });
 
 /**
- * Unit test the `Logger` class, set/get default logging level.
+ * Unit test the `Logger` class, set/get the default logging level.
  *
  * @author Haixing Hu
  */
-describe('Logger: set/get default logging level', () => {
+describe('Logger: set/get the default logging level', () => {
   test('set correct default logging level', () => {
     Logger.setDefaultLevel('ERROR');
     const appender = new CustomizedAppender();
@@ -630,6 +631,95 @@ describe('Logger: set/get default logging level', () => {
       RangeError,
       'Unknown logging level "YYYY". '
         + 'Possible values are：["TRACE","DEBUG","INFO","WARN","ERROR","NONE"].',
+    );
+  });
+});
+
+/**
+ * Unit test the `Logger` class, set/reset the default appender.
+ *
+ * @author Haixing Hu
+ */
+describe('Logger: set/reset the default appender', () => {
+  test('Logger.setDefaultAppender() and Logger.resetDefaultAppender() should work', () => {
+    const logger1 = Logger.getLogger('l1');
+    const logger2 = Logger.getLogger('l2');
+    const logger3 = Logger.getLogger('l3');
+    const oldAppender = Logger.getDefaultAppender();
+    expect(logger1.getAppender()).toBe(oldAppender);
+    expect(logger2.getAppender()).toBe(oldAppender);
+    expect(logger3.getAppender()).toBe(oldAppender);
+    const newAppender = new CustomizedAppender();
+    Logger.setDefaultAppender(newAppender);
+    const logger4 = Logger.getLogger('l4');
+    expect(logger1.getAppender()).toBe(oldAppender);
+    expect(logger2.getAppender()).toBe(oldAppender);
+    expect(logger3.getAppender()).toBe(oldAppender);
+    expect(logger4.getAppender()).toBe(newAppender);
+    Logger.resetDefaultAppender();
+    const defaultAppender = Logger.getDefaultAppender();
+    expect(defaultAppender).toBe(oldAppender);
+    const logger5 = Logger.getLogger('l5');
+    expect(logger1.getAppender()).toBe(oldAppender);
+    expect(logger2.getAppender()).toBe(oldAppender);
+    expect(logger3.getAppender()).toBe(oldAppender);
+    expect(logger4.getAppender()).toBe(newAppender);
+    expect(logger5.getAppender()).toBe(oldAppender);
+  });
+  test('Logger.setDefaultAppender() with invalid appender', () => {
+    const NOOP = () => {};
+    expect(() => Logger.setDefaultAppender(null)).toThrowWithMessage(
+      TypeError,
+      'The appender for a logger must be a non-null object.',
+    );
+    expect(() => Logger.setDefaultAppender('hello')).toThrowWithMessage(
+      TypeError,
+      'The appender for a logger must be a non-null object.',
+    );
+    expect(() => Logger.setDefaultAppender({
+      debug: NOOP,
+      info: NOOP,
+      warn: NOOP,
+      error: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no trace() method.',
+    );
+    expect(() => Logger.setDefaultAppender({
+      trace: NOOP,
+      info: NOOP,
+      warn: NOOP,
+      error: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no debug() method.',
+    );
+    expect(() => Logger.setDefaultAppender({
+      trace: NOOP,
+      debug: NOOP,
+      warn: NOOP,
+      error: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no info() method.',
+    );
+    expect(() => Logger.setDefaultAppender({
+      trace: NOOP,
+      debug: NOOP,
+      info: NOOP,
+      error: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no warn() method.',
+    );
+    expect(() => Logger.setDefaultAppender({
+      trace: NOOP,
+      debug: NOOP,
+      info: NOOP,
+      warn: NOOP,
+    })).toThrowWithMessage(
+      Error,
+      'The appender of this logger has no error() method.',
     );
   });
 });

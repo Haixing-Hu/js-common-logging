@@ -15,11 +15,20 @@ import {
 } from './logger-utils';
 
 /**
- * The default value of the Logger class's default logging level.
+ * The factory value of the Logger class's default logging level,
+ * which is `DEBUG`.
  *
  * @type {string}
  */
-const DEFAULT_DEFAULT_LEVEL = 'DEBUG';
+const FACTORY_DEFAULT_LEVEL = 'DEBUG';
+
+/**
+ * The factory value of the Logger class's default log appender, which is
+ * the standard output pipe of the console.
+ *
+ * @type {Console}
+ */
+const FACTORY_DEFAULT_APPENDER = console;
 
 /**
  * The default logging level of all `Logger` instances, which is `DEBUG`.
@@ -27,15 +36,16 @@ const DEFAULT_DEFAULT_LEVEL = 'DEBUG';
  * @private
  * @author Haixing Hu
  */
-let __defaultLevel = DEFAULT_DEFAULT_LEVEL;
+let __defaultLevel = FACTORY_DEFAULT_LEVEL;
 
 /**
- * The default log appender of all `Logger` instances, which is `console`.
+ * The default log appender of all `Logger` instances, which is the standard
+ * output pipe of the console.
  *
  * @private
  * @author Haixing Hu
  */
-let __defaultAppender = console;
+let __defaultAppender = FACTORY_DEFAULT_APPENDER;
 
 /**
  * The map of all `Logger` instances.
@@ -112,12 +122,12 @@ class Logger {
    * @param {Object} options
    *     The optional options of the `Logger` instance to be retrieved. This
    *     option object may have the following properties:
-   *     - `appender: Object`: the specified content output pipe of the log.
+   *     - `appender: object`: the specified content output pipe of the log.
    *       This object must provide `trace`, `debug`, `info`, `warn` and `error`
    *       methods. If this option is not provided, the appender of the existing
    *       `Logger` instance will not be changed, and the default appender
    *       will be used to construct a new `Logger` instance if it does not exist.
-   *     - `level: String`: the logging level of the `Logger` instance to be
+   *     - `level: string`: the logging level of the `Logger` instance to be
    *       retrieved. The allowed levels are `TRACE`, `DEBUG`, `INFO`, `WARN`,
    *       `ERROR`, and `NONE`. Lowercase letters are also allowed. If this
    *       option is not provided, the logging level of the existing `Logger`
@@ -163,7 +173,7 @@ class Logger {
    *
    * @param name
    *     The name of the `Logger` instance.
-   * @returns {String|string}
+   * @returns {string}
    *     The logging level of the `Logger` instance of the specified name. If the
    *     `Logger` instance of the specified name does not exist, the default
    *     logging level will be returned.
@@ -194,10 +204,13 @@ class Logger {
   }
 
   /**
-   * Gets the default logging level of all `Logger` instants.
+   * Gets the default logging level.
+   *
+   * The default logging level is used to construct a new `Logger` instance if
+   * the logging level of the new instance is not specified.
    *
    * @return {string}
-   *     The default logging level of all `Logger` instants.
+   *     The global default logging level.
    * @see Logger.setDefaultLevel
    * @see Logger.setAllLevels
    * @see Logger.resetAllLevels
@@ -207,12 +220,14 @@ class Logger {
   }
 
   /**
-   * Sets the default logging level of all `Logger` instants.
+   * Sets the default logging level.
+   *
+   * The default logging level is used to construct a new `Logger` instance if
+   * the logging level of the new instance is not specified.
    *
    * @param {string} level
-   *     The new default logging level of all `Logger` instants. The allowed
-   *     levels are `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
-   *     Lowercase letters are also allowed.
+   *     The new default logging level. The allowed levels are `TRACE`, `DEBUG`,
+   *     `INFO`, `WARN`, `ERROR`, and `NONE`. Lowercase letters are also allowed.
    * @see Logger.getDefaultLevel
    * @see Logger.setAllLevels
    * @see Logger.resetAllLevels
@@ -224,20 +239,22 @@ class Logger {
   }
 
   /**
-   * Resets the default logging level of all `Logger` instants to the default
-   * value.
+   * Resets the default logging level to the factory value.
+   *
+   * The default logging level is used to construct a new `Logger` instance if
+   * the logging level of the new instance is not specified.
    */
   static resetDefaultLevel() {
-    __defaultLevel = DEFAULT_DEFAULT_LEVEL;
+    __defaultLevel = FACTORY_DEFAULT_LEVEL;
   }
 
   /**
-   * Sets the logging level of all `Logger` instants.
+   * Sets the logging level of all existing `Logger` instants.
    *
    * @param {string} level
-   *    The new logging level of all `Logger` instants. The allowed levels are
-   *    `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`. Lowercase letters
-   *    are also allowed.
+   *    The new logging level of all existing `Logger` instants. The allowed
+   *    levels are `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `NONE`.
+   *    Lowercase letters are also allowed.
    * @see Logger.getDefaultLevel
    * @see Logger.setDefaultLevel
    * @see Logger.resetAllLevels
@@ -262,10 +279,13 @@ class Logger {
   }
 
   /**
-   * Gets the default log appender of all `Logger` instants.
+   * Gets the default logging appender.
+   *
+   * The default logging appender is used to construct a new `Logger` instance
+   * if the logging appender of the new instance is not specified.
    *
    * @return {Object}
-   *     The default log appender of all `Logger` instants.
+   *     The default logging appender.
    * @see Logger.setDefaultAppender
    * @see Logger.setAllAppenders
    * @see Logger.resetAllAppenders
@@ -275,10 +295,13 @@ class Logger {
   }
 
   /**
-   * Sets the default log appender of all `Logger` instants.
+   * Sets the default logging appender.
    *
-   * @param {Object} appender
-   *     The new default log appender of all `Logger` instants.
+   * The default logging appender is used to construct a new `Logger` instance
+   * if the logging appender of the new instance is not specified.
+   *
+   * @param {object} appender
+   *     The new default logging appender.
    * @see Logger.getDefaultAppender
    * @see Logger.setAllAppenders
    * @see Logger.resetAllAppenders
@@ -289,9 +312,21 @@ class Logger {
   }
 
   /**
+   * Resets the default logging appender to the factory value.
+   *
+   * The default logging appender is used to construct a new `Logger` instance
+   * if the logging appender of the new instance is not specified.
+   *
+   * @see Logger.getDefaultAppender
+   */
+  static resetDefaultAppender() {
+    __defaultAppender = FACTORY_DEFAULT_APPENDER;
+  }
+
+  /**
    * Sets the appender of all `Logger` instants.
    *
-   * @param {Object} appender
+   * @param {object} appender
    *     The new appender to be set, indicating the content output pipe of the
    *     log. This object must provide `trace`, `debug`, `info`, `warn` and
    *     `error` methods.
@@ -326,7 +361,7 @@ class Logger {
    * @param {string} name
    *     The optional name of this logger. The default value of this argument
    *     is an empty string.
-   * @param {Object} appender
+   * @param {object} appender
    *     Optional, indicating the content output pipe of the log. This object
    *     must provide `trace`, `debug`, `info`, `warn` and `error` methods.
    *     The default value of this argument is `Logger.getDefaultAppender()`.
@@ -371,7 +406,7 @@ class Logger {
   /**
    * Get the appender of this logger.
    *
-   * @return {Object}
+   * @return {object}
    *     The appender of this logger.
    */
   getAppender() {
@@ -381,7 +416,7 @@ class Logger {
   /**
    * Set up a new Appender.
    *
-   * @param {Object} appender
+   * @param {object} appender
    *     The new Appender serves as the content output pipeline of the log.
    *     This object must provide `trace`, `debug`, `info`, `warn` and `error`
    *     methods.
@@ -434,7 +469,7 @@ class Logger {
   /**
    * Enable or disable this log object.
    *
-   * @param {Boolean} enabled
+   * @param {boolean} enabled
    *    Whether to enable this log object.
    */
   setEnabled(enabled) {
@@ -455,7 +490,7 @@ class Logger {
    *     or equal to this target logging level will be bind to the corresponding
    *     logging methods of the appender. This argument should be a valid
    *     logging level. The function do not check the validity of this argument.
-   * @param {Object} appender
+   * @param {object} appender
    *     The appender whose logging methods will be bound to the corresponding
    *     logging methods of this logger. This argument should be a valid appender.
    *     The function do not check the validity of this argument.
