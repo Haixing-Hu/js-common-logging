@@ -15,3 +15,5 @@ export {
   Log,
   HasLogger,
 };
+
+export default Logger;

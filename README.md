@@ -66,7 +66,7 @@ You can use placeholders in log messages to dynamically insert variables:
 Example:
 
 ```javascript
-import { Logger } from '@haixing_hu/logging';
+import Logger from '@haixing_hu/logging';
 
 const logger = Logger.getLogger('MyClass');
 logger.trace('This is a trace message with argument %s and argument %o', 'foo', { bar: 'baz' });
