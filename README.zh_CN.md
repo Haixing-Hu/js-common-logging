@@ -185,7 +185,7 @@ export default toVue(MyComponent);
 
 ## <span id="contributing">贡献</span>
 
-如果您发现任何问题或有改进建议，请随时在 [GitHub 仓库] 上提交 issue 或 pull request。
+如果您发现任何问题或有改进建议，请随时在[GitHub 仓库]上提交 issue 或 pull request。
 
 ## <span id="license">许可证</span>
 
@@ -193,4 +193,4 @@ export default toVue(MyComponent);
 
 [@haixing_hu/logging]: https://npmjs.com/package/@haixing_hu/logging
 [Vue.js 类组件]: https://github.com/Haixing-Hu/vue3-class-component/
-[GitHub repository]: https://github.com/Haixing-Hu/js-logging
+[GitHub 仓库]: https://github.com/Haixing-Hu/js-logging
