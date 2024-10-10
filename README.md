@@ -8,7 +8,7 @@
 
 [@haixing_hu/logging] is a JavaScript library that provides powerful 
 logging capabilities through decorators for class methods and properties. 
-This library is designed to seamlessly integrate with Vue.js class components, 
+This library is designed to seamlessly integrate with [Vue.js class components], 
 offering an elegant solution for handling logging in your JavaScript projects.
 
 ## Installation
@@ -178,7 +178,7 @@ class MyClass {
 
 ## Using with Vue.js Class Components
 
-You can use the `@Log` and `@HasLogger` decorators with Vue.js class components:
+You can use the `@Log` and `@HasLogger` decorators with [Vue.js class components]:
 
 ```javascript
 import { HasLogger, Log } from '@haixing_hu/logging';
@@ -214,4 +214,5 @@ to open an issue or submit a pull request to the [GitHub repository].
 See the [LICENSE](LICENSE) file for more details.
 
 [@haixing_hu/logging]: https://npmjs.com/package/@haixing_hu/logging
+[Vue.js class components]: https://github.com/Haixing-Hu/vue3-class-component/
 [GitHub repository]: https://github.com/Haixing-Hu/js-logging
