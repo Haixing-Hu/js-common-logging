@@ -6,7 +6,7 @@
 //    All rights reserved.
 //
 ////////////////////////////////////////////////////////////////////////////////
-const Logger = commonLogging.Logger;
+const Logger = Logging.Logger;
 const logger = Logger.getLogger('MyLogger');
 
 function updateLogStateForm() {
