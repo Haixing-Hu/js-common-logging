@@ -135,6 +135,12 @@ without specifying the level or appender.
   loggers.
 - `Logger.resetAllAppenders()`: Resets the logging appender of all existing loggers
   to the default logging appender.
+
+### Reset to Factory Defaults
+
+- `Logger.reset()`: Resets all loggers to the factory default settings. This
+  includes clearing all existing loggers, and resetting the default logging 
+  level and the default logging appender.
   
 ## The `@Log` Decorator
 

@@ -12,6 +12,7 @@ import CustomizedAppender from './helper/customized-appender';
 import Foo from './helper/foo';
 import Hello from './helper/hello-vue';
 import MyClass from './helper/my-class';
+import { beforeEachHook, afterEachHook } from './helper/jest-hooks';
 
 /**
  * Unit test `@Log` decorator.
@@ -19,6 +20,14 @@ import MyClass from './helper/my-class';
  * @author Haixing Hu
  */
 describe('Test @Log decorator', () => {
+  beforeEach(() => {
+    beforeEachHook();
+  });
+
+  afterEach(() => {
+    afterEachHook();
+  });
+
   test('Ordinary class method, no parameter', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');

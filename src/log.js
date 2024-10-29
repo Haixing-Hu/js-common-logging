@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 import Logger from './logger';
-import { VUE3_CLASS_COMPONENT_DECORATORS_KEY } from './metadata-keys';
+import { VUE3_CLASS_COMPONENT_DECORATORS_KEY } from './impl/metadata-keys';
 
 /**
  * The names of special functions of Vue components.

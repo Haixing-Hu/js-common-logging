@@ -6,13 +6,12 @@
 //    All rights reserved.
 //
 ////////////////////////////////////////////////////////////////////////////////
-import {
-  NOOP,
-  LOGGING_LEVELS,
-  checkAppend,
-  checkLoggingLevel,
-  upperCaseString,
-} from './logger-utils';
+import LOGGING_LEVELS from './impl/logging-levels';
+import checkAppender from './impl/check-appender';
+import checkLoggingLevel from './impl/check-logging-level';
+import upperCaseString from './impl/upper-case-string';
+import isString from './impl/is-string';
+import bindLoggingMethods from './impl/bind-logging-methods';
 
 /**
  * The factory value of the Logger class's default logging level,
@@ -138,17 +137,18 @@ class Logger {
    *       existing one or a newly constructed one.
    */
   static getLogger(name = '', options = {}) {
-    if (typeof name !== 'string') {
+    if (!isString(name)) {
       throw new TypeError('The name of a logger must be a string, and empty string is allowed.');
     }
-    let logger = __loggerMap.get(name);
+    const theName = String(name); // make sure the name is a primitive string
+    let logger = __loggerMap.get(theName);
     if (logger === undefined) {
       // sets the internally constructing flag before constructing a instance
       __isInternalConstructing = true;
-      logger = new Logger(name, options.appender, options.level);
+      logger = new Logger(theName, options.appender, options.level);
       // clear the internally constructing flag after constructing the new instance
       __isInternalConstructing = false;
-      __loggerMap.set(name, logger);
+      __loggerMap.set(theName, logger);
     } else {
       if (options.appender !== undefined) {
         logger.setAppender(options.appender);
@@ -307,7 +307,7 @@ class Logger {
    * @see Logger.resetAllAppenders
    */
   static setDefaultAppender(appender) {
-    checkAppend(appender);
+    checkAppender(appender);
     __defaultAppender = appender;
   }
 
@@ -335,7 +335,7 @@ class Logger {
    * @see Logger.resetAllAppenders
    */
   static setAllAppenders(appender) {
-    checkAppend(appender);
+    checkAppender(appender);
     for (const logger of __loggerMap.values()) {
       logger.setAppender(appender);
     }
@@ -350,6 +350,20 @@ class Logger {
    */
   static resetAllAppenders() {
     Logger.setAllAppenders(__defaultAppender);
+  }
+
+  /**
+   * Resets all configurations of the `Logger` class to the factory values.
+   *
+   * This method is equivalent to calling the following methods in sequence:
+   * - `Logger.clearAllLoggers()`
+   * - `Logger.resetDefaultLevel()`
+   * - `Logger.resetDefaultAppender()`
+   */
+  static reset() {
+    Logger.clearAllLoggers();
+    Logger.resetDefaultLevel();
+    Logger.resetDefaultAppender();
   }
 
   /**
@@ -378,7 +392,7 @@ class Logger {
     if (appender === undefined) {
       appender = __defaultAppender;
     } else {
-      checkAppend(appender);
+      checkAppender(appender);
     }
     if (level === undefined) {
       level = __levelMap.get(name) ?? __defaultLevel;
@@ -389,7 +403,7 @@ class Logger {
     this._name = name;
     this._level = level;
     this._appender = appender;
-    this._bindLoggingMethods(level, appender);
+    bindLoggingMethods(this, level, appender);
     __levelMap.set(name, level);
   }
 
@@ -422,8 +436,8 @@ class Logger {
    *     methods.
    */
   setAppender(appender) {
-    checkAppend(appender);
-    this._bindLoggingMethods(this._level, appender);
+    checkAppender(appender);
+    bindLoggingMethods(this, this._level, appender);
     this._appender = appender;
   }
 
@@ -448,7 +462,7 @@ class Logger {
   setLevel(level) {
     level = upperCaseString(level);
     checkLoggingLevel(level);
-    this._bindLoggingMethods(level, this._appender);
+    bindLoggingMethods(this, level, this._appender);
     this._level = level;
   }
 
@@ -456,14 +470,14 @@ class Logger {
    * Disable this logging object.
    */
   disable() {
-    this._bindLoggingMethods('NONE', this._appender);
+    bindLoggingMethods(this, 'NONE', this._appender);
   }
 
   /**
    * Enable this logging object.
    */
   enable() {
-    this._bindLoggingMethods(this._level, this._appender);
+    bindLoggingMethods(this, this._level, this._appender);
   }
 
   /**
@@ -479,83 +493,6 @@ class Logger {
       this.disable();
     }
   }
-
-  /**
-   * Rebinds all logging implementation methods to the corresponding logging
-   * methods of the appender.
-   *
-   * @param {string} level
-   *     The target logging level. All logging methods belows this target logging
-   *     level will be bind to a no-op function, while all logging methods above
-   *     or equal to this target logging level will be bind to the corresponding
-   *     logging methods of the appender. This argument should be a valid
-   *     logging level. The function do not check the validity of this argument.
-   * @param {object} appender
-   *     The appender whose logging methods will be bound to the corresponding
-   *     logging methods of this logger. This argument should be a valid appender.
-   *     The function do not check the validity of this argument.
-   * @private
-   */
-  _bindLoggingMethods(level, appender) {
-    const target = LOGGING_LEVELS[level];
-    for (const level in LOGGING_LEVELS) {
-      // NOTE: do NOT use Object.hasOwn() because it has a lot of compatibility problems
-      if (Object.prototype.hasOwnProperty.call(LOGGING_LEVELS, level) && (level !== 'NONE')) {
-        const m = level.toLowerCase();
-        if (LOGGING_LEVELS[level] < target) {
-          // binds the private logging method of this object to no-op
-          this[m] = NOOP;
-        } else {
-          // binds the private logging method of this object to the
-          // corresponding logging method of this.appender.
-          //
-          // We use the `Function.prototype.bind` to preserve the actual source
-          // code location where the logging method is called.
-          // See: https://stackoverflow.com/questions/13815640/a-proper-wrapper-for-console-log-with-correct-line-number
-          //
-          // Another way to preserve the correct source code location of calling
-          // Logger's logging methods is to use the stack trace of the Error
-          // object. But it's too heavy and significantly affects the performance.
-          // See: https://stackoverflow.com/questions/57436034/wrap-consol-log-with-bind-to-keep-caller-context
-          //      https://github.com/MrToph/stacklogger/
-          //      https://github.com/baryon/tracer
-          //
-          const prefix = this._getPrefix(level);
-          this[m] = Function.prototype.bind.call(appender[m], appender, prefix);
-          // this[m] = Function.prototype.bind.call(this._fixFirstArguments, this, level, appender[m], appender);
-        }
-      }
-    }
-  }
-
-  _getPrefix(level) {
-    let prefix = `[${level}] `;
-    if (this._name) {
-      prefix += `${this._name} - `;
-    }
-    // Note that we add a string substitution pattern '%s' to the end of
-    // the prefix, since according to the specification of the `console`,
-    // the string substitution is taken on the first argument recursively.
-    // See: https://stackoverflow.com/questions/75160241/what-order-does-console-log-with-multiple-arguments-and-multiple-s-substitu#answer-75167070
-    //      https://console.spec.whatwg.org/#logger
-    //      https://console.spec.whatwg.org/#formatter
-    //
-    // But the `console` object of the Node.js does not support the recursive
-    // string substitution.
-    // See: https://nodejs.org/api/console.html#console_console_log_data_args
-    //  and https://nodejs.org/api/util.html#utilformatformat-args
-    prefix += '%s';
-    return prefix;
-  }
-
-  // _fixFirstArguments(level, method, appender, arg) {
-  //   const prefix = this._getPrefix(level);
-  //   if (arg === 'string') {
-  //     return Function.prototype.bind.call(method, appender, prefix + arg);
-  //   } else {
-  //     return Function.prototype.bind.call(method, appender, prefix, arg);
-  //   }
-  // }
 
   /**
    * Logs a message in the specified logging level.

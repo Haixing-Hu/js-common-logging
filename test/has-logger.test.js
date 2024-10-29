@@ -12,6 +12,7 @@ import CustomizedAppender from './helper/customized-appender';
 import MyClass from './helper/my-class';
 import HelloWithLogger from './helper/hello-with-logger-vue';
 import HelloWithLoggerWrongOrder from './helper/hello-with-logger-wrong-order-vue';
+import { beforeEachHook, afterEachHook } from './helper/jest-hooks';
 
 /**
  * Unit test `@HasLogger` decorator.
@@ -19,6 +20,14 @@ import HelloWithLoggerWrongOrder from './helper/hello-with-logger-wrong-order-vu
  * @author Haixing Hu
  */
 describe('Test @HasLogger decorator for normal class.', () => {
+  beforeEach(() => {
+    beforeEachHook();
+  });
+
+  afterEach(() => {
+    afterEachHook();
+  });
+
   test('Normal class', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('MyClass');

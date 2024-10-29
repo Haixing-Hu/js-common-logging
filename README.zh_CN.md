@@ -118,6 +118,10 @@ logger.setAppender(console);    // Outputs log messages to the console.
 - `Logger.setAllAppenders(appender)`：将指定日志 appender 应用于所有现有日志记录器。
 - `Logger.resetAllAppenders()`：将所有现有日志记录器的日志 appender 重置为默认 appender。
 
+### 重置日志记录器
+
+- `Logger.reset()`：将日志记录器重置为出厂状态。这将清除所有已注册的日志记录器、重置默认日志级别和默认日志 appender。
+
 ## `@Log` 装饰器
 
 `@Log` 装饰器会自动记录方法签名，包括类名、方法名和参数。
