@@ -51,9 +51,9 @@ const VUE_FUNCTIONS = [
 function printMethodLog(className, methodName, args) {
   const logger = Logger.getLogger(className);
   if (args.length === 0) {
-    logger.debug('%s.%s.', className, methodName);
+    logger.trace('%s.%s.', className, methodName);
   } else {
-    logger.debug('%s.%s:', className, methodName, ...args);
+    logger.trace('%s.%s:', className, methodName, ...args);
   }
 }
 

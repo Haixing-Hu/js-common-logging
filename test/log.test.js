@@ -32,13 +32,14 @@ describe('Test @Log decorator', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');
     logger.setAppender(appender);
+    logger.setLevel('TRACE');
     const foo = new Foo();
     foo.test();
     expect(appender.logs.length).toBe(1);
     expect(appender.logs[0]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Foo - %s',
+        '[TRACE] Foo - %s',
         '%s.%s.',
         'Foo',
         'test',
@@ -50,13 +51,14 @@ describe('Test @Log decorator', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');
     logger.setAppender(appender);
+    logger.setLevel('TRACE');
     const foo = new Foo();
     foo.say('Hello');
     expect(appender.logs.length).toBe(1);
     expect(appender.logs[0]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Foo - %s',
+        '[TRACE] Foo - %s',
         '%s.%s:',
         'Foo',
         'say',
@@ -68,13 +70,14 @@ describe('Test @Log decorator', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('Foo');
     logger.setAppender(appender);
+    logger.setLevel('TRACE');
     const foo = new Foo();
     foo.add(1, 2);
     expect(appender.logs.length).toBe(2);
     expect(appender.logs[0]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Foo - %s',
+        '[TRACE] Foo - %s',
         '%s.%s:',
         'Foo',
         'add',
@@ -83,9 +86,9 @@ describe('Test @Log decorator', () => {
       ],
     });
     expect(appender.logs[1]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Foo - %s',
+        '[TRACE] Foo - %s',
         '%s.%s:',
         'Foo',
         'say',
@@ -97,6 +100,7 @@ describe('Test @Log decorator', () => {
   test('@Log decorator for Vue class component methods', async () => {
     const appender = new CustomizedAppender();
     Logger.setDefaultAppender(appender);
+    Logger.setDefaultLevel('TRACE');
     const hello = mount(Hello);
     await hello.vm.$nextTick();
     // Check rendering results
@@ -105,9 +109,9 @@ describe('Test @Log decorator', () => {
     // Check the log of `Hello.created()`
     expect(appender.logs.length).toBe(1);
     expect(appender.logs[0]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Hello - %s',
+        '[TRACE] Hello - %s',
         '%s.%s.',
         'Hello',
         'created',
@@ -117,9 +121,9 @@ describe('Test @Log decorator', () => {
     hello.vm.foo(1, 2);
     expect(appender.logs.length).toBe(2);
     expect(appender.logs[1]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Hello - %s',
+        '[TRACE] Hello - %s',
         '%s.%s:',
         'Hello',
         'foo',
@@ -132,9 +136,9 @@ describe('Test @Log decorator', () => {
     expect(result).toBe(3);
     expect(appender.logs.length).toBe(3);
     expect(appender.logs[2]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] Hello - %s',
+        '[TRACE] Hello - %s',
         '%s.%s:',
         'Hello',
         'add',

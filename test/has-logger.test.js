@@ -32,6 +32,7 @@ describe('Test @HasLogger decorator for normal class.', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('MyClass');
     logger.setAppender(appender);
+    logger.setLevel('TRACE')
     const obj = new MyClass();
     expect(obj.logger).toBe(logger);
     obj.foo();
@@ -46,9 +47,9 @@ describe('Test @HasLogger decorator for normal class.', () => {
     obj.add(1, 2);
     expect(appender.logs.length).toBe(3);
     expect(appender.logs[1]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] MyClass - %s',
+        '[TRACE] MyClass - %s',
         '%s.%s:',
         'MyClass',
         'add',
@@ -71,6 +72,7 @@ describe('Test @HasLogger decorator for normal class.', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('HelloWithLogger');
     logger.setAppender(appender);
+    logger.setLevel('TRACE');
     const hello = mount(HelloWithLogger);
     await hello.vm.$nextTick();
     // Check rendering results
@@ -81,9 +83,9 @@ describe('Test @HasLogger decorator for normal class.', () => {
     // Check the log of `Hello.created()`
     expect(appender.logs.length).toBe(2);
     expect(appender.logs[0]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] HelloWithLogger - %s',
+        '[TRACE] HelloWithLogger - %s',
         '%s.%s.',
         'HelloWithLogger',
         'created',
@@ -100,9 +102,9 @@ describe('Test @HasLogger decorator for normal class.', () => {
     hello.vm.foo(1, 2);
     expect(appender.logs.length).toBe(5);
     expect(appender.logs[2]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] HelloWithLogger - %s',
+        '[TRACE] HelloWithLogger - %s',
         '%s.%s:',
         'HelloWithLogger',
         'foo',
@@ -136,9 +138,9 @@ describe('Test @HasLogger decorator for normal class.', () => {
     expect(result).toBe(5);
     expect(appender.logs.length).toBe(7);
     expect(appender.logs[5]).toEqual({
-      type: 'DEBUG',
+      type: 'TRACE',
       args: [
-        '[DEBUG] HelloWithLogger - %s',
+        '[TRACE] HelloWithLogger - %s',
         '%s.%s:',
         'HelloWithLogger',
         'add',
