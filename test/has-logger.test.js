@@ -32,7 +32,7 @@ describe('Test @HasLogger decorator for normal class.', () => {
     const appender = new CustomizedAppender();
     const logger = Logger.getLogger('MyClass');
     logger.setAppender(appender);
-    logger.setLevel('TRACE')
+    logger.setLevel('TRACE');
     const obj = new MyClass();
     expect(obj.logger).toBe(logger);
     obj.foo();
