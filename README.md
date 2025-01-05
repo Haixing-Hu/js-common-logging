@@ -1,12 +1,12 @@
 # js-logging
 
-[![npm package](https://img.shields.io/npm/v/@haixing_hu/logging.svg)](https://npmjs.com/package/@haixing_hu/logging)
+[![npm package](https://img.shields.io/npm/v/@qubit-ltd/logging.svg)](https://npmjs.com/package/@qubit-ltd/logging)
 [![License](https://img.shields.io/badge/License-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![中文文档](https://img.shields.io/badge/文档-中文版-blue.svg)](README.zh_CN.md)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/Haixing-Hu/js-logging/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/Haixing-Hu/js-logging/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/Haixing-Hu/js-logging/badge.svg?branch=master)](https://coveralls.io/github/Haixing-Hu/js-logging?branch=master)
 
-[@haixing_hu/logging] is a JavaScript library that provides powerful 
+[@qubit-ltd/logging] is a JavaScript library that provides powerful 
 logging capabilities through decorators for class methods and properties. 
 This library is designed to seamlessly integrate with [Vue.js class components], 
 offering an elegant solution for handling logging in your JavaScript projects.
@@ -15,11 +15,11 @@ offering an elegant solution for handling logging in your JavaScript projects.
 
 To install the library, use either npm or yarn:
 ```sh
-npm install @haixing_hu/logging
+npm install @qubit-ltd/logging
 ```
 or
 ```sh
-yarn add @haixing_hu/logging
+yarn add @qubit-ltd/logging
 ```
 
 ## The `Logger` Class
@@ -66,7 +66,7 @@ You can use placeholders in log messages to dynamically insert variables:
 Example:
 
 ```javascript
-import Logger from '@haixing_hu/logging';
+import Logger from '@qubit-ltd/logging';
 
 const logger = Logger.getLogger('MyClass');
 logger.trace('This is a trace message with argument %s and argument %o', 'foo', { bar: 'baz' });
@@ -150,7 +150,7 @@ class name, method name, and parameters.
 Example:
 
 ```javascript
-import { Log } from '@haixing_hu/logging';
+import { Log } from '@qubit-ltd/logging';
 
 class Person {
   @Log
@@ -172,7 +172,7 @@ via the `logger` property.
 Example:
 
 ```javascript
-import { HasLogger } from '@haixing_hu/logging';
+import { HasLogger } from '@qubit-ltd/logging';
 
 @HasLogger
 class MyClass {
@@ -187,8 +187,8 @@ class MyClass {
 You can use the `@Log` and `@HasLogger` decorators with [Vue.js class components]:
 
 ```javascript
-import { HasLogger, Log } from '@haixing_hu/logging';
-import { Component, toVue } from '@haixing_hu/vue3-class-component';
+import { HasLogger, Log } from '@qubit-ltd/logging';
+import { Component, toVue } from '@qubit-ltd/vue3-class-component';
 
 @Component({
   template: '<p @click="foo">{{ message }}</p>',
@@ -216,9 +216,9 @@ to open an issue or submit a pull request to the [GitHub repository].
 
 ## <span id="license">License</span>
 
-[@haixing_hu/logging] is distributed under the Apache 2.0 license.
+[@qubit-ltd/logging] is distributed under the Apache 2.0 license.
 See the [LICENSE](LICENSE) file for more details.
 
-[@haixing_hu/logging]: https://npmjs.com/package/@haixing_hu/logging
+[@qubit-ltd/logging]: https://npmjs.com/package/@qubit-ltd/logging
 [Vue.js class components]: https://github.com/Haixing-Hu/vue3-class-component/
 [GitHub repository]: https://github.com/Haixing-Hu/js-logging

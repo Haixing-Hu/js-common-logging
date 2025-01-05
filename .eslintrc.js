@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 module.exports = {
   root: true,
-  parser: "@babel/eslint-parser",
+  parser: '@babel/eslint-parser',
   extends: [
-    '@haixing_hu/eslint-config',
+    '@qubit-ltd/eslint-config',
   ],
 };

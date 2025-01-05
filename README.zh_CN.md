@@ -1,23 +1,23 @@
 # js-logging
 
-[![npm package](https://img.shields.io/npm/v/@haixing_hu/logging.svg)](https://npmjs.com/package/@haixing_hu/logging)
+[![npm package](https://img.shields.io/npm/v/@qubit-ltd/logging.svg)](https://npmjs.com/package/@qubit-ltd/logging)
 [![License](https://img.shields.io/badge/License-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![English Document](https://img.shields.io/badge/Document-English-blue.svg)](README.md)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/Haixing-Hu/js-logging/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/Haixing-Hu/js-logging/tree/master)
 [![Coverage Status](https://coveralls.io/repos/github/Haixing-Hu/js-logging/badge.svg?branch=master)](https://coveralls.io/github/Haixing-Hu/js-logging?branch=master)
 
-[@haixing_hu/logging] 是一个 JavaScript 库，通过装饰器为类方法和属性提供强大的日志记录功能。
+[@qubit-ltd/logging] 是一个 JavaScript 库，通过装饰器为类方法和属性提供强大的日志记录功能。
 该库旨在与[Vue.js 类组件]无缝集成，为处理 JavaScript 项目中的日志记录提供了优雅的解决方案。
 
 ## 安装
 
 使用 npm 或 yarn 安装该库：
 ```sh
-npm install @haixing_hu/logging
+npm install @qubit-ltd/logging
 ```
 或
 ```sh
-yarn add @haixing_hu/logging
+yarn add @qubit-ltd/logging
 ```
 
 ## `Logger` 类
@@ -54,7 +54,7 @@ yarn add @haixing_hu/logging
 示例：
 
 ```javascript
-import Logger from '@haixing_hu/logging';
+import Logger from '@qubit-ltd/logging';
 
 const logger = Logger.getLogger('MyClass');
 logger.trace('This is a trace message with argument %s and argument %o', 'foo', { bar: 'baz' });
@@ -129,7 +129,7 @@ logger.setAppender(console);    // Outputs log messages to the console.
 示例：
 
 ```javascript
-import { Log } from '@haixing_hu/logging';
+import { Log } from '@qubit-ltd/logging';
 
 class Person {
   @Log
@@ -150,7 +150,7 @@ person.eat(meal); // The log will print the method calling signature
 示例：
 
 ```javascript
-import { HasLogger } from '@haixing_hu/logging';
+import { HasLogger } from '@qubit-ltd/logging';
 
 @HasLogger
 class MyClass {
@@ -165,8 +165,8 @@ class MyClass {
 你可以在[Vue.js 类组件]中使用 `@Log` 和 `@HasLogger` 装饰器：
 
 ```javascript
-import { HasLogger, Log } from '@haixing_hu/logging';
-import { Component, toVue } from '@haixing_hu/vue3-class-component';
+import { HasLogger, Log } from '@qubit-ltd/logging';
+import { Component, toVue } from '@qubit-ltd/vue3-class-component';
 
 @Component({
   template: '<p @click="foo">{{ message }}</p>',
@@ -193,8 +193,8 @@ export default toVue(MyComponent);
 
 ## <span id="license">许可证</span>
 
-[@haixing_hu/logging] 根据 Apache 2.0 许可证分发。详情请参阅 [LICENSE](LICENSE) 文件。
+[@qubit-ltd/logging] 根据 Apache 2.0 许可证分发。详情请参阅 [LICENSE](LICENSE) 文件。
 
-[@haixing_hu/logging]: https://npmjs.com/package/@haixing_hu/logging
+[@qubit-ltd/logging]: https://npmjs.com/package/@qubit-ltd/logging
 [Vue.js 类组件]: https://github.com/Haixing-Hu/vue3-class-component/
 [GitHub 仓库]: https://github.com/Haixing-Hu/js-logging
